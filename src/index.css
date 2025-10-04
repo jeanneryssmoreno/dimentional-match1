@@ -1,1 +1,7 @@
 @import "tailwindcss";
+
+   @custom-variant dark-mode {
+      --tw-bg-opacity: 1;
+      background-color: theme('colors.gray.800'); /* Ejemplo: fondo oscuro /
+      color: theme('colors.white'); / Ejemplo: texto blanco */
+    }
