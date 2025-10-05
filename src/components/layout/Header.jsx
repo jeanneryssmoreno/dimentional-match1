@@ -1,6 +1,5 @@
 import useTheme  from "../../contexts/useTheme";
 
-
 export default function Header() {
   const { theme, toggleTheme } = useTheme();
   return (
