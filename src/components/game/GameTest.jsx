@@ -4,8 +4,10 @@
 
 import React, { useState } from 'react';
 import { GameProvider } from '../../contexts/GameContext.jsx';
+import { useLevelProgress } from '../../hooks/useLevelProgress.js';
 import { THEMES } from '../../types/character.js';
 import GameBoard from './GameBoard.jsx';
+import LevelSelector from '../levels/LevelSelector.jsx';
 
 /**
  * Componente de prueba del juego
@@ -13,6 +15,8 @@ import GameBoard from './GameBoard.jsx';
 const GameTest = () => {
   const [selectedTheme, setSelectedTheme] = useState(THEMES.RICK_MORTY);
   const [selectedLevel, setSelectedLevel] = useState(1);
+  const [testMode, setTestMode] = useState('classic'); // 'classic' | 'level-system'
+  const { playerProgress, updateLevelProgress } = useLevelProgress();
 
   return (
     <GameProvider>
@@ -28,88 +32,133 @@ const GameTest = () => {
             </p>
           </div>
 
-          {/* Controles de configuración */}
+          {/* Selector de modo de prueba */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">
-              Configuración de Prueba
+              Modo de Prueba
             </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Selector de tema */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Tema:
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {Object.values(THEMES).map((theme) => (
-                    <button
-                      key={theme}
-                      onClick={() => setSelectedTheme(theme)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        selectedTheme === theme
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {theme.charAt(0).toUpperCase() + theme.slice(1).replace(/([A-Z])/g, ' $1')}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Selector de nivel */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Nivel:
-                </label>
-                <div className="grid grid-cols-5 gap-2">
-                  {[1, 2, 3, 4, 5].map((level) => (
-                    <button
-                      key={level}
-                      onClick={() => setSelectedLevel(level)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        selectedLevel === level
-                          ? 'bg-green-500 text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {level}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Información del nivel seleccionado */}
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-              <h3 className="font-medium text-gray-800 mb-2">
-                Configuración del Nivel {selectedLevel}:
-              </h3>
-              <div className="grid grid-cols-3 gap-4 text-sm">
-                <div>
-                  <span className="text-gray-600">Pares:</span>
-                  <span className="ml-2 font-medium">
-                    {getLevelPairs(selectedLevel)}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-gray-600">Cartas totales:</span>
-                  <span className="ml-2 font-medium">
-                    {getLevelPairs(selectedLevel) * 2}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-gray-600">Tiempo:</span>
-                  <span className="ml-2 font-medium">
-                    {getLevelTime(selectedLevel)}s
-                  </span>
-                </div>
-              </div>
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={() => setTestMode('classic')}
+                className={`px-6 py-3 rounded-lg font-medium transition-colors ${
+                  testMode === 'classic'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                🎮 Modo Clásico
+              </button>
+              <button
+                onClick={() => setTestMode('level-system')}
+                className={`px-6 py-3 rounded-lg font-medium transition-colors ${
+                  testMode === 'level-system'
+                    ? 'bg-green-500 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                🏆 Sistema de Niveles
+              </button>
             </div>
           </div>
 
-          {/* Tablero del juego */}
-          <GameBoard theme={selectedTheme} level={selectedLevel} />
+          {/* Contenido según el modo */}
+          {testMode === 'classic' && (
+            <>
+              {/* Controles de configuración */}
+              <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                  Configuración de Prueba
+                </h2>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Selector de tema */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Tema:
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {Object.values(THEMES).map((theme) => (
+                        <button
+                          key={theme}
+                          onClick={() => setSelectedTheme(theme)}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            selectedTheme === theme
+                              ? 'bg-blue-500 text-white'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          {theme.charAt(0).toUpperCase() + theme.slice(1).replace(/([A-Z])/g, ' $1')}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Selector de nivel */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Nivel:
+                    </label>
+                    <div className="grid grid-cols-5 gap-2">
+                      {[1, 2, 3, 4, 5].map((level) => (
+                        <button
+                          key={level}
+                          onClick={() => setSelectedLevel(level)}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            selectedLevel === level
+                              ? 'bg-green-500 text-white'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          {level}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Información del nivel seleccionado */}
+                <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                  <h3 className="font-medium text-gray-800 mb-2">
+                    Configuración del Nivel {selectedLevel}:
+                  </h3>
+                  <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-600">Pares:</span>
+                      <span className="ml-2 font-medium">
+                        {getLevelPairs(selectedLevel)}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Cartas totales:</span>
+                      <span className="ml-2 font-medium">
+                        {getLevelPairs(selectedLevel) * 2}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Tiempo:</span>
+                      <span className="ml-2 font-medium">
+                        {getLevelTime(selectedLevel)}s
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tablero del juego */}
+              <GameBoard theme={selectedTheme} level={selectedLevel} />
+            </>
+          )}
+
+          {testMode === 'level-system' && (
+            <LevelSelector
+              onLevelSelect={(levelId) => {
+                setSelectedLevel(levelId);
+                // Aquí podrías integrar con GameBoard si fuera necesario
+              }}
+              currentLevel={selectedLevel}
+              playerProgress={playerProgress}
+            />
+          )}
 
           {/* Información de testing */}
           <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
@@ -146,12 +195,12 @@ const GameTest = () => {
               📋 Instrucciones de Prueba
             </h3>
             <div className="text-sm text-yellow-700 space-y-2">
-              <p><strong>1. Configuración:</strong> Selecciona diferentes temas y niveles para probar la carga de personajes.</p>
-              <p><strong>2. Inicio del juego:</strong> Presiona "Iniciar Juego" y verifica que el timer comience.</p>
-              <p><strong>3. Jugabilidad:</strong> Haz clic en las cartas para revelarlas y busca coincidencias.</p>
-              <p><strong>4. Pausa:</strong> Usa el botón de pausa para verificar que el timer se detiene.</p>
-              <p><strong>5. Estadísticas:</strong> Observa cómo cambian las estadísticas durante el juego.</p>
-              <p><strong>6. Finalización:</strong> Completa el juego o deja que se agote el tiempo para probar ambos finales.</p>
+              <p><strong>Modo Clásico:</strong> Selecciona diferentes temas y niveles para probar la carga de personajes.</p>
+              <p><strong>Modo Nivel:</strong> Prueba el sistema completo de niveles con progreso y desbloqueos.</p>
+              <p><strong>Inicio del juego:</strong> Presiona "Iniciar Juego" y verifica que el timer comience.</p>
+              <p><strong>Jugabilidad:</strong> Haz clic en las cartas para revelarlas y busca coincidencias.</p>
+              <p><strong>Pausa:</strong> Usa el botón de pausa para verificar que el timer se detiene.</p>
+              <p><strong>Finalización:</strong> Completa el juego o deja que se agote el tiempo para probar ambos finales.</p>
             </div>
           </div>
         </div>

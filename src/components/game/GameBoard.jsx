@@ -1,8 +1,4 @@
-/**
- * Componente principal del tablero de juego
- */
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useGameLogic } from '../../hooks/useGameLogic.js';
 import { useGameTimer } from '../../hooks/useGameTimer.js';
 import { useGameStats } from '../../hooks/useGameStats.js';
@@ -15,7 +11,10 @@ import GameTimer from './GameTimer.jsx';
 /**
  * Componente del tablero de juego
  */
-const GameBoard = ({ theme, level = 1 }) => {
+/**
+ * Componente del tablero de juego
+ */
+const GameBoard = ({ theme, level = 1, onGameComplete }) => {
   const {
     gameState,
     cards,
@@ -44,6 +43,28 @@ const GameBoard = ({ theme, level = 1 }) => {
     performance,
     getFormattedStats
   } = useGameStats();
+
+  // Notificar cuando el juego termine
+  useEffect(() => {
+    if ((isGameComplete || isGameOver) && onGameComplete) {
+      const gameResult = {
+        completed: isGameComplete,
+        score: basicStats.score,
+        accuracy: basicStats.accuracy,
+        timeUsed: gameState.startTime ? Math.floor((Date.now() - gameState.startTime) / 1000) : 0,
+        moves: basicStats.moves,
+        matchedPairs: basicStats.matchedPairs,
+        totalPairs: basicStats.totalPairs,
+        level: level,
+        theme: theme,
+        timeBonusScore: Math.floor(basicStats.score * 0.2), // Ejemplo de cálculo
+        streakBonusScore: Math.floor(basicStats.score * 0.1), // Ejemplo de cálculo
+        baseScore: basicStats.score
+      };
+
+      onGameComplete(gameResult);
+    }
+  }, [isGameComplete, isGameOver, onGameComplete, basicStats, gameState.startTime, level, theme]);
 
   // Mostrar loading
   if (isLoading) {
@@ -191,9 +212,18 @@ const GameBoard = ({ theme, level = 1 }) => {
             >
               Jugar de nuevo
             </button>
-            {level < 5 && (
+            {level < 5 && onGameComplete && (
               <button
-                onClick={() => {/* Lógica para siguiente nivel */}}
+                onClick={() => {
+                  // Llamar al callback para indicar que se quiere avanzar
+                  if (onGameComplete) {
+                    onGameComplete({
+                      completed: true,
+                      advanceToNext: true,
+                      level: level
+                    });
+                  }
+                }}
                 className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors"
               >
                 Siguiente nivel

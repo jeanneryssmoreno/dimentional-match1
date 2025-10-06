@@ -7,10 +7,10 @@ import React, { createContext, useContext, useReducer, useEffect, useCallback } 
 import { 
   GAME_STATES, 
   CARD_STATES, 
-  getLevelConfig, 
   calculateMatchScore,
   TIMER_CONFIG 
 } from '../types/game.js';
+import { getLevelConfig } from '../types/levels.js';
 
 // Estado inicial del juego
 const initialGameState = {
@@ -44,7 +44,9 @@ const GAME_ACTIONS = {
   RESET_GAME: 'RESET_GAME',
   RESET_STREAK: 'RESET_STREAK',
   SET_LEVEL: 'SET_LEVEL',
-  SET_THEME: 'SET_THEME'
+  SET_THEME: 'SET_THEME',
+  ADVANCE_LEVEL: 'ADVANCE_LEVEL',
+  SET_LEVEL_PROGRESS: 'SET_LEVEL_PROGRESS'
 };
 
 /**
@@ -206,6 +208,22 @@ function gameReducer(state, action) {
       return {
         ...state,
         streak: 0
+      };
+
+    case GAME_ACTIONS.ADVANCE_LEVEL:
+      const nextLevel = Math.min(state.level + 1, 5);
+      const nextLevelConfig = getLevelConfig(nextLevel);
+      return {
+        ...initialGameState,
+        level: nextLevel,
+        theme: state.theme,
+        timeRemaining: nextLevelConfig.time
+      };
+
+    case GAME_ACTIONS.SET_LEVEL_PROGRESS:
+      return {
+        ...state,
+        levelProgress: action.progress
       };
 
     default:

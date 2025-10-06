@@ -4,6 +4,7 @@ import Layout from './components/layout/Layout';
 import Home from './pages/Home';
 import ApiTestComponent from './components/common/ApiTestComponent';
 import GameTest from './components/game/GameTest';
+import LevelGameTest from './components/game/LevelGame';
 
 // Crear instancia del QueryClient
 const queryClient = new QueryClient({
@@ -28,6 +29,8 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/api-test" element={<ApiTestComponent />} />
             <Route path="/game-test" element={<GameTest />} />
+            <Route path="/level-test" element={<LevelGameTest />} />
+            <Route path="/level-game" element={<LevelGameTest />} />
           </Routes>
         </Layout>
       </BrowserRouter>
