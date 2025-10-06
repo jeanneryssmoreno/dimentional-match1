@@ -1,120 +1,119 @@
 /**
- * Página Home
- * Pantalla principal con selección de temas
+ * Página Principal - Home
+ * Selección de temas con modal de reglas integrado
  */
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ThemeCard from '../components/common/ThemeCard';
-import Button from '../components/ui/Button';
 import { THEME_LIST } from '../constants/themes';
+import ThemeCard from '../components/common/ThemeCard';
+import RulesModal from '../components/game/RulesModal';
+import Button from '../components/ui/Button';
 
 export default function Home() {
+  const [showRules, setShowRules] = useState(false);
   const navigate = useNavigate();
-  const [selectedTheme, setSelectedTheme] = useState(null);
 
   const handleThemeSelect = (theme) => {
-    setSelectedTheme(theme);
-  };
-
-  const handleStartGame = () => {
-    if (selectedTheme) {
-      // TODO: Navegación al juego con el tema seleccionado
-      console.log('Iniciando juego con tema:', selectedTheme.id);
-      // navigate(`/game/${selectedTheme.id}`);
-    }
+    // Navegar al juego con el tema seleccionado
+    navigate(`/game/${theme.id}`);
   };
 
   const handleShowRules = () => {
-    // TODO: Mostrar modal de reglas (Sprint 2)
-    console.log('Mostrar reglas del juego');
+    setShowRules(true);
+  };
+
+  const handleCloseRules = () => {
+    setShowRules(false);
   };
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen">
       {/* Hero Section */}
-      <div className="text-center mb-12">
-        <h2 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-          🎮 Juego de Memoria Dimensional
-        </h2>
-        <p className="text-xl text-gray-600 dark:text-gray-300 mb-6">
-          Pon a prueba tu memoria explorando diferentes universos
+      <section className="text-center mb-16">
+        <div className="text-8xl mb-6">🧠</div>
+        <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+          Dimentional Match
+        </h1>
+        <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
+          ¡Pon a prueba tu memoria con personajes de tus universos favoritos! 
+          Encuentra los pares antes de que se acabe el tiempo.
         </p>
         
-        <div className="flex justify-center gap-4">
-          <Button 
-            variant="outline" 
-            onClick={handleShowRules}
-            size="large"
-          >
-            📖 Ver Reglas
-          </Button>
-        </div>
-      </div>
+        {/* Botón de Reglas */}
+        <Button 
+          onClick={handleShowRules}
+          variant="outline"
+          size="large"
+          className="mb-8"
+        >
+          📖 Ver Reglas del Juego
+        </Button>
+      </section>
 
-      {/* Theme Selection */}
-      <div className="mb-8">
-        <h3 className="text-2xl font-bold text-center mb-6 text-gray-800 dark:text-gray-100">
-          Selecciona tu Universo
-        </h3>
+      {/* Selección de Temas */}
+      <section className="mb-16">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800 dark:text-gray-100">
+          🎯 Elige tu Universo
+        </h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {THEME_LIST.map((theme) => (
-            <div
+            <ThemeCard
               key={theme.id}
-              className={`transform transition-transform ${
-                selectedTheme?.id === theme.id ? 'scale-105 ring-4 ring-blue-500 rounded-xl' : ''
-              }`}
-            >
-              <ThemeCard 
-                theme={theme} 
-                onSelect={handleThemeSelect}
-              />
-            </div>
+              theme={theme}
+              onSelect={handleThemeSelect}
+            />
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Selected Theme Info */}
-      {selectedTheme && (
-        <div className="text-center mt-8 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl border-2 border-blue-200 dark:border-blue-700">
-          <p className="text-lg mb-4 text-gray-700 dark:text-gray-200">
-            Has seleccionado: <span className="font-bold">{selectedTheme.name}</span> {selectedTheme.icon}
-          </p>
-          <Button 
-            onClick={handleStartGame}
-            size="large"
-            className="px-8"
-          >
-            🚀 Comenzar Juego
-          </Button>
+      {/* Características del Juego */}
+      <section className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-2xl p-8 mb-16">
+        <h2 className="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-gray-100">
+          ✨ Características
+        </h2>
+        
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="text-center">
+            <div className="text-4xl mb-3">🎮</div>
+            <h3 className="font-semibold text-gray-800 dark:text-gray-100 mb-2">5 Niveles</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              Desde principiante hasta experto
+            </p>
+          </div>
+          
+          <div className="text-center">
+            <div className="text-4xl mb-3">🎯</div>
+            <h3 className="font-semibold text-gray-800 dark:text-gray-100 mb-2">Sistema de Rachas</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              Multiplica tu puntuación
+            </p>
+          </div>
+          
+          <div className="text-center">
+            <div className="text-4xl mb-3">🏆</div>
+            <h3 className="font-semibold text-gray-800 dark:text-gray-100 mb-2">Puntuación</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              Sistema de puntos y bonificaciones
+            </p>
+          </div>
+          
+          <div className="text-center">
+            <div className="text-4xl mb-3">🎨</div>
+            <h3 className="font-semibold text-gray-800 dark:text-gray-100 mb-2">5 Temas</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              Rick & Morty, Star Wars, y más
+            </p>
+          </div>
         </div>
-      )}
+      </section>
 
-      {/* Instructions */}
-      <div className="mt-12 p-6 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-xl">
-        <h4 className="text-xl font-bold mb-3 text-gray-800 dark:text-gray-100">
-          ¿Cómo jugar?
-        </h4>
-        <ul className="space-y-2 text-gray-700 dark:text-gray-300">
-          <li className="flex items-start">
-            <span className="mr-2">🎯</span>
-            <span>Selecciona un tema de tu universo favorito</span>
-          </li>
-          <li className="flex items-start">
-            <span className="mr-2">🃏</span>
-            <span>Encuentra todos los pares de cartas antes de que se acabe el tiempo</span>
-          </li>
-          <li className="flex items-start">
-            <span className="mr-2">⏱️</span>
-            <span>Completa 5 niveles con dificultad creciente</span>
-          </li>
-          <li className="flex items-start">
-            <span className="mr-2">🏆</span>
-            <span>¡Puedes jugar solo o con un amigo!</span>
-          </li>
-        </ul>
-      </div>
+      {/* Modal de Reglas */}
+      <RulesModal 
+        isOpen={showRules}
+        onClose={handleCloseRules}
+      />
     </div>
   );
 }
