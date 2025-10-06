@@ -10,9 +10,10 @@ import { getRandomPokemonCharacters, adaptPokemonCharacter } from '../adapters/p
  * Hook para obtener Pokemon
  * @param {number} count - Número de Pokemon a obtener
  * @param {number} offset - Offset para paginación
+ * @param {Object} options - Opciones adicionales para useQuery
  * @returns {Object} Query result con Pokemon normalizados
  */
-export function usePokemonCharacters(count = 8, offset = 0) {
+export function usePokemonCharacters(count = 8, offset = 0, options = {}) {
   return useQuery({
     queryKey: ['pokemonCharacters', count, offset],
     queryFn: async () => {
@@ -23,6 +24,7 @@ export function usePokemonCharacters(count = 8, offset = 0) {
     cacheTime: 30 * 60 * 1000, // 30 minutos
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    ...options,
   });
 }
 

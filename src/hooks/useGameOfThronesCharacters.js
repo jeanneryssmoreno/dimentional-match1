@@ -9,9 +9,10 @@ import { getRandomGameOfThronesCharacters, adaptGameOfThronesCharacter } from '.
 /**
  * Hook para obtener personajes de Game of Thrones
  * @param {number} count - Número de personajes a obtener
+ * @param {Object} options - Opciones adicionales para useQuery
  * @returns {Object} Query result con personajes normalizados
  */
-export function useGameOfThronesCharacters(count = 8) {
+export function useGameOfThronesCharacters(count = 8, options = {}) {
   return useQuery({
     queryKey: ['gameOfThronesCharacters', count],
     queryFn: async () => {
@@ -22,6 +23,7 @@ export function useGameOfThronesCharacters(count = 8) {
     cacheTime: 30 * 60 * 1000, // 30 minutos
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    ...options, // Permitir override de opciones
   });
 }
 

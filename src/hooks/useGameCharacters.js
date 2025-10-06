@@ -28,11 +28,29 @@ import { getRandomPokemonCharacters } from '../adapters/pokemonAdapter.js';
  * @returns {Object} Query result con personajes del tema seleccionado
  */
 export function useGameCharacters(theme, count = 8) {
-  // Para temas individuales, usar hooks específicos
-  const rickMortyQuery = useRickMortyCharacters(count, 1);
-  const starWarsQuery = useStarWarsCharacters(count, 1);
-  const gameOfThronesQuery = useGameOfThronesCharacters(count);
-  const pokemonQuery = usePokemonCharacters(count, 0);
+  // Para temas individuales, usar hooks específicos con enabled condicional
+  const rickMortyQuery = useRickMortyCharacters(
+    count, 
+    1, 
+    { enabled: theme === THEMES.RICK_MORTY }
+  );
+  
+  const starWarsQuery = useStarWarsCharacters(
+    count, 
+    1, 
+    { enabled: theme === THEMES.STAR_WARS }
+  );
+  
+  const gameOfThronesQuery = useGameOfThronesCharacters(
+    count, 
+    { enabled: theme === THEMES.GAME_OF_THRONES }
+  );
+  
+  const pokemonQuery = usePokemonCharacters(
+    count, 
+    0, 
+    { enabled: theme === THEMES.POKEMON }
+  );
 
   // Para tema mixto, usar query personalizada
   const mixedQuery = useQuery({

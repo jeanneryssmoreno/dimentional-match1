@@ -16,22 +16,36 @@ const API_ENDPOINTS = {
 export const apiClient = {
   async get(url, options = {}) {
     try {
+      console.log(`🔄 Fetching: ${url}`);
+      
       const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
+          'Accept': 'application/json',
           ...options.headers
         },
+        mode: 'cors', // Explicitly set CORS mode
         ...options
       });
 
+      console.log(`📡 Response status: ${response.status} for ${url}`);
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
       }
 
-      return await response.json();
+      const data = await response.json();
+      console.log(`✅ Data received from ${url}:`, data?.length ? `${data.length} items` : 'Single item');
+      
+      return data;
     } catch (error) {
-      console.error('API request failed:', error);
+      console.error(`❌ API request failed for ${url}:`, error);
+      
+      // Provide more specific error information
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        throw new Error(`Network error: Unable to reach ${url}. Check your internet connection or API availability.`);
+      }
+      
       throw error;
     }
   }

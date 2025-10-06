@@ -10,9 +10,10 @@ import { getRandomRickMortyCharacters, adaptRickMortyCharacter } from '../adapte
  * Hook para obtener personajes de Rick and Morty
  * @param {number} count - Número de personajes a obtener
  * @param {number} page - Página a consultar
+ * @param {Object} options - Opciones adicionales para useQuery
  * @returns {Object} Query result con personajes normalizados
  */
-export function useRickMortyCharacters(count = 8, page = 1) {
+export function useRickMortyCharacters(count = 8, page = 1, options = {}) {
   return useQuery({
     queryKey: ['rickMortyCharacters', count, page],
     queryFn: async () => {
@@ -23,6 +24,7 @@ export function useRickMortyCharacters(count = 8, page = 1) {
     cacheTime: 10 * 60 * 1000, // 10 minutos
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    ...options,
   });
 }
 
