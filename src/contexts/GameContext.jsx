@@ -42,6 +42,7 @@ const GAME_ACTIONS = {
   COMPLETE_GAME: 'COMPLETE_GAME',
   GAME_OVER: 'GAME_OVER',
   RESET_GAME: 'RESET_GAME',
+  RESET_STREAK: 'RESET_STREAK',
   SET_LEVEL: 'SET_LEVEL',
   SET_THEME: 'SET_THEME'
 };
@@ -134,11 +135,11 @@ function gameReducer(state, action) {
       );
 
       const newStreak = state.streak + 1;
-      const levelConfig = getLevelConfig(state.level);
+      const currentLevelConfig = getLevelConfig(state.level);
       const matchScore = calculateMatchScore(
         state.level, 
         state.timeRemaining, 
-        levelConfig.time, 
+        currentLevelConfig.time, 
         newStreak
       );
 
@@ -199,6 +200,12 @@ function gameReducer(state, action) {
       return {
         ...state,
         theme: action.theme
+      };
+
+    case GAME_ACTIONS.RESET_STREAK:
+      return {
+        ...state,
+        streak: 0
       };
 
     default:

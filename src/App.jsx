@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Layout from './components/layout/Layout';
 import Home from './pages/Home';
 import ApiTestComponent from './components/common/ApiTestComponent';
+import GameTest from './components/game/GameTest';
 
 // Crear instancia del QueryClient
 const queryClient = new QueryClient({
@@ -26,6 +27,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/api-test" element={<ApiTestComponent />} />
+            <Route path="/game-test" element={<GameTest />} />
           </Routes>
         </Layout>
       </BrowserRouter>
