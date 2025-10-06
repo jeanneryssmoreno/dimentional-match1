@@ -8,7 +8,7 @@ import { useRickMortyCharacters } from './useRickMortyCharacters.js';
 import { useStarWarsCharacters } from './useStarWarsCharacters.js';
 import { useGameOfThronesCharacters } from './useGameOfThronesCharacters.js';
 import { usePokemonCharacters } from './usePokemonCharacters.js';
-//
+
 // Servicios para tema mixto
 import { rickMortyService } from '../services/rickMortyService.js';
 import { starWarsService } from '../services/starWarsService.js';
