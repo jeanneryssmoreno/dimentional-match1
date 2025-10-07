@@ -26,7 +26,8 @@ const SCREEN_STATES = {
   LEVEL_SELECT: 'level_select',
   PLAYING: 'playing',
   VICTORY: 'victory',
-  GAME_OVER: 'game_over'
+  GAME_OVER: 'game_over',
+  LOADING: 'loading'
 };
 
 export default function Game() {
@@ -164,14 +165,15 @@ export default function Game() {
   const handleNextLevel = useCallback(() => {
     if (currentLevel < 5) {
       const nextLevel = currentLevel + 1;
-      // Primero cerrar el modal
-      setScreenState(SCREEN_STATES.PLAYING);
+      // Pasar por estado de loading para cerrar el modal completamente
+      setScreenState(SCREEN_STATES.LOADING);
       setLastGameResult(null);
       
-      // Pequeño delay para asegurar que el modal se cierra antes de cargar el nuevo nivel
+      // Pequeño delay para asegurar limpieza completa
       setTimeout(() => {
         setCurrentLevel(nextLevel);
-      }, 100);
+        setScreenState(SCREEN_STATES.PLAYING);
+      }, 150);
     } else {
       // Completó todos los niveles
       handleBackToHome();
@@ -248,6 +250,18 @@ export default function Game() {
             >
               ← Volver al Menú
             </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Estado de Carga */}
+      {screenState === SCREEN_STATES.LOADING && (
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-500 mx-auto mb-4"></div>
+            <p className="text-xl font-semibold text-gray-700 dark:text-gray-300">
+              Cargando Nivel {currentLevel}...
+            </p>
           </div>
         </div>
       )}
