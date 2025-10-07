@@ -201,13 +201,21 @@ export default function Game() {
    * Reintentar el nivel actual
    */
   const handleRetry = useCallback(() => {
+    // 1. Limpiar resultado anterior
     setLastGameResult(null);
+    
+    // 2. IMPORTANTE: Resetear el estado del juego en el contexto
+    // Esto limpia el estado COMPLETED que causaba que el modal reapareciera
+    resetGame();
+    
+    // 3. Cambiar a estado de loading
     setScreenState(SCREEN_STATES.LOADING);
     
+    // 4. Delay para reiniciar el juego
     setTimeout(() => {
       setScreenState(SCREEN_STATES.PLAYING);
     }, 100);
-  }, []);
+  }, [resetGame]);
 
   /**
    * Cerrar modal y volver al selector de niveles
