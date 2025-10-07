@@ -269,6 +269,7 @@ export default function Game() {
           </div>
 
           <GameBoard
+            key={`${themeId}-${currentLevel}`}
             theme={themeId}
             level={currentLevel}
             onGameComplete={handleGameComplete}
