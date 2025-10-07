@@ -15,6 +15,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { THEME_LIST } from '../constants/themes';
 import { useLevelProgress } from '../hooks/useLevelProgress';
 import { useGamePersistence } from '../hooks/useGamePersistence';
+import { useGame } from '../contexts/GameContext';
 import GameBoard from '../components/game/GameBoard';
 import VictoryModal from '../components/game/VictoryModal';
 import GameOverModal from '../components/game/GameOverModal';
@@ -33,6 +34,9 @@ const SCREEN_STATES = {
 export default function Game() {
   const { theme: themeId } = useParams();
   const navigate = useNavigate();
+  
+  // Hook del contexto del juego para resetear estado
+  const { resetGame } = useGame();
   
   // Hooks de persistencia
   const {
@@ -165,20 +169,33 @@ export default function Game() {
   const handleNextLevel = useCallback(() => {
     if (currentLevel < 5) {
       const nextLevel = currentLevel + 1;
-      // Pasar por estado de loading para cerrar el modal completamente
-      setScreenState(SCREEN_STATES.LOADING);
+      
+      // 1. Cerrar el modal primero cambiando el estado
+      setScreenState(SCREEN_STATES.LEVEL_SELECT);
+      
+      // 2. Limpiar completamente el resultado anterior
       setLastGameResult(null);
       
-      // Pequeño delay para asegurar limpieza completa
+      // 3. IMPORTANTE: Resetear el estado del juego en el contexto
+      // Esto limpia el estado COMPLETED que causaba el problema
+      resetGame();
+      
+      // 4. Pequeño delay para asegurar que el modal se cierre y los estados se limpien
       setTimeout(() => {
-        setCurrentLevel(nextLevel);
-        setScreenState(SCREEN_STATES.PLAYING);
-      }, 150);
+        // 5. Cambiar al estado de loading
+        setScreenState(SCREEN_STATES.LOADING);
+        
+        // 6. Otro delay para mostrar el loading y luego iniciar el juego
+        setTimeout(() => {
+          setCurrentLevel(nextLevel);
+          setScreenState(SCREEN_STATES.PLAYING);
+        }, 200);
+      }, 100);
     } else {
       // Completó todos los niveles
       handleBackToHome();
     }
-  }, [currentLevel, handleBackToHome]);
+  }, [currentLevel, handleBackToHome, resetGame]);
 
   /**
    * Reintentar el nivel actual
@@ -311,7 +328,7 @@ export default function Game() {
 
       {/* Modal de Victoria */}
       <VictoryModal
-        isOpen={screenState === SCREEN_STATES.VICTORY}
+        isOpen={screenState === SCREEN_STATES.VICTORY && lastGameResult !== null}
         onClose={handleCloseModal}
         gameResult={lastGameResult}
         onNextLevel={currentLevel < 5 ? handleNextLevel : null}
@@ -322,7 +339,7 @@ export default function Game() {
 
       {/* Modal de Game Over */}
       <GameOverModal
-        isOpen={screenState === SCREEN_STATES.GAME_OVER}
+        isOpen={screenState === SCREEN_STATES.GAME_OVER && lastGameResult !== null}
         onClose={handleCloseModal}
         gameResult={lastGameResult}
         onRetry={handleRetry}
