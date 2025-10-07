@@ -151,6 +151,14 @@ export default function Game() {
   }, [themeId, currentLevel, saveGameResult, updateLevelProgress]);
 
   /**
+   * Volver al home
+   */
+  const handleBackToHome = useCallback(() => {
+    endSession();
+    navigate('/');
+  }, [navigate, endSession]);
+
+  /**
    * Avanza al siguiente nivel
    */
   const handleNextLevel = useCallback(() => {
@@ -163,7 +171,7 @@ export default function Game() {
       // Completó todos los niveles
       handleBackToHome();
     }
-  }, [currentLevel]);
+  }, [currentLevel, handleBackToHome]);
 
   /**
    * Reintentar el nivel actual
@@ -181,14 +189,6 @@ export default function Game() {
     setShowLevelSelector(true);
     setLastGameResult(null);
   }, []);
-
-  /**
-   * Volver al home
-   */
-  const handleBackToHome = useCallback(() => {
-    endSession();
-    navigate('/');
-  }, [navigate, endSession]);
 
   // Obtener mejor puntuación del nivel actual
   const currentLevelStats = getLevelStats(currentLevel);
