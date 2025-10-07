@@ -184,8 +184,21 @@ export default function Game() {
    * Reintentar el nivel actual
    */
   const handleRetry = useCallback(() => {
-    setScreenState(SCREEN_STATES.PLAYING);
     setLastGameResult(null);
+    setScreenState(SCREEN_STATES.LOADING);
+    
+    setTimeout(() => {
+      setScreenState(SCREEN_STATES.PLAYING);
+    }, 100);
+  }, []);
+
+  /**
+   * Cerrar modal y volver al selector de niveles
+   */
+  const handleCloseModal = useCallback(() => {
+    setLastGameResult(null);
+    setScreenState(SCREEN_STATES.LEVEL_SELECT);
+    setShowLevelSelector(true);
   }, []);
 
   /**
@@ -299,7 +312,7 @@ export default function Game() {
       {/* Modal de Victoria */}
       <VictoryModal
         isOpen={screenState === SCREEN_STATES.VICTORY}
-        onClose={() => setScreenState(SCREEN_STATES.LEVEL_SELECT)}
+        onClose={handleCloseModal}
         gameResult={lastGameResult}
         onNextLevel={currentLevel < 5 ? handleNextLevel : null}
         onRetry={handleRetry}
@@ -310,7 +323,7 @@ export default function Game() {
       {/* Modal de Game Over */}
       <GameOverModal
         isOpen={screenState === SCREEN_STATES.GAME_OVER}
-        onClose={() => setScreenState(SCREEN_STATES.LEVEL_SELECT)}
+        onClose={handleCloseModal}
         gameResult={lastGameResult}
         onRetry={handleRetry}
         onBackToHome={handleBackToHome}
