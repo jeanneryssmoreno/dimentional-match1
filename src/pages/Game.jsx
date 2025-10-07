@@ -164,9 +164,14 @@ export default function Game() {
   const handleNextLevel = useCallback(() => {
     if (currentLevel < 5) {
       const nextLevel = currentLevel + 1;
-      setCurrentLevel(nextLevel);
+      // Primero cerrar el modal
       setScreenState(SCREEN_STATES.PLAYING);
       setLastGameResult(null);
+      
+      // Pequeño delay para asegurar que el modal se cierra antes de cargar el nuevo nivel
+      setTimeout(() => {
+        setCurrentLevel(nextLevel);
+      }, 100);
     } else {
       // Completó todos los niveles
       handleBackToHome();
