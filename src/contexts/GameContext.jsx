@@ -7,10 +7,10 @@ import React, { createContext, useContext, useReducer, useEffect, useCallback } 
 import { 
   GAME_STATES, 
   CARD_STATES, 
-  getLevelConfig, 
   calculateMatchScore,
   TIMER_CONFIG 
 } from '../types/game.js';
+import { getLevelConfig } from '../types/levels.js';
 
 // Estado inicial del juego
 const initialGameState = {
@@ -26,7 +26,8 @@ const initialGameState = {
   timeRemaining: 0,
   startTime: null,
   isTimerActive: false,
-  streak: 0
+  streak: 0,
+  isShuffling: false
 };
 
 // Acciones del reducer
@@ -44,7 +45,11 @@ const GAME_ACTIONS = {
   RESET_GAME: 'RESET_GAME',
   RESET_STREAK: 'RESET_STREAK',
   SET_LEVEL: 'SET_LEVEL',
-  SET_THEME: 'SET_THEME'
+  SET_THEME: 'SET_THEME',
+  ADVANCE_LEVEL: 'ADVANCE_LEVEL',
+  SET_LEVEL_PROGRESS: 'SET_LEVEL_PROGRESS',
+  SHUFFLE_CARDS: 'SHUFFLE_CARDS',
+  SET_SHUFFLING: 'SET_SHUFFLING'
 };
 
 /**
@@ -208,6 +213,54 @@ function gameReducer(state, action) {
         streak: 0
       };
 
+    case GAME_ACTIONS.ADVANCE_LEVEL:
+      const nextLevel = Math.min(state.level + 1, 5);
+      const nextLevelConfig = getLevelConfig(nextLevel);
+      return {
+        ...initialGameState,
+        level: nextLevel,
+        theme: state.theme,
+        timeRemaining: nextLevelConfig.time
+      };
+
+    case GAME_ACTIONS.SET_LEVEL_PROGRESS:
+      return {
+        ...state,
+        levelProgress: action.progress
+      };
+
+    case GAME_ACTIONS.SHUFFLE_CARDS:
+      // Función para barajar array usando Fisher-Yates
+      const shuffleArray = (array) => {
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+      };
+
+      // Reset all cards to hidden state and shuffle positions
+      const shuffledCards = shuffleArray(
+        state.cards.map(card => ({
+          ...card,
+          state: CARD_STATES.HIDDEN
+        }))
+      );
+
+      return {
+        ...state,
+        cards: shuffledCards,
+        revealedCards: [],
+        isShuffling: false
+      };
+
+    case GAME_ACTIONS.SET_SHUFFLING:
+      return {
+        ...state,
+        isShuffling: action.isShuffling
+      };
+
     default:
       return state;
   }
@@ -278,8 +331,23 @@ export function GameProvider({ children }) {
   }, []);
 
   const startGame = useCallback(() => {
-    dispatch({ type: GAME_ACTIONS.START_GAME });
-  }, []);
+    // Primero barajear las cartas automáticamente
+    if (gameState.cards.length > 0) {
+      dispatch({ type: GAME_ACTIONS.SET_SHUFFLING, isShuffling: true });
+      
+      // Después de un delay, realizar el barajeo y luego iniciar el juego
+      setTimeout(() => {
+        dispatch({ type: GAME_ACTIONS.SHUFFLE_CARDS });
+        // Iniciar el juego después del barajeo
+        setTimeout(() => {
+          dispatch({ type: GAME_ACTIONS.START_GAME });
+        }, 200);
+      }, 1500); // 1.5 segundos de animación de barajeo inicial
+    } else {
+      // Si no hay cartas, iniciar directamente
+      dispatch({ type: GAME_ACTIONS.START_GAME });
+    }
+  }, [gameState.cards.length]);
 
   const pauseGame = useCallback(() => {
     dispatch({ type: GAME_ACTIONS.PAUSE_GAME });
@@ -308,6 +376,25 @@ export function GameProvider({ children }) {
     dispatch({ type: GAME_ACTIONS.SET_THEME, theme });
   }, []);
 
+  const shuffleCards = useCallback(() => {
+    // Solo permitir barajeo si el juego está activo
+    if (gameState.status !== GAME_STATES.PLAYING) {
+      return;
+    }
+    
+    // Activar estado de barajeo
+    dispatch({ type: GAME_ACTIONS.SET_SHUFFLING, isShuffling: true });
+    
+    // Después de un delay más largo, realizar el barajeo y reiniciar el juego
+    setTimeout(() => {
+      dispatch({ type: GAME_ACTIONS.SHUFFLE_CARDS });
+      // Reiniciar automáticamente el juego después del barajeo
+      setTimeout(() => {
+        dispatch({ type: GAME_ACTIONS.START_GAME });
+      }, 200);
+    }, 2500); // 2.5 segundos de animación de barajeo
+  }, [gameState.status]);
+
   // Context value
   const contextValue = {
     // State
@@ -322,12 +409,13 @@ export function GameProvider({ children }) {
     resetGame,
     setLevel,
     setTheme,
+    shuffleCards,
     
     // Computed values
     isGameActive: gameState.status === GAME_STATES.PLAYING,
     isGameComplete: gameState.status === GAME_STATES.COMPLETED,
     isGameOver: gameState.status === GAME_STATES.GAME_OVER,
-    canRevealCards: gameState.revealedCards.length < 2 && gameState.status === GAME_STATES.PLAYING,
+    canRevealCards: gameState.revealedCards.length < 2 && gameState.status === GAME_STATES.PLAYING && !gameState.isShuffling,
     progress: gameState.totalPairs > 0 ? (gameState.matchedPairs / gameState.totalPairs) * 100 : 0
   };
 

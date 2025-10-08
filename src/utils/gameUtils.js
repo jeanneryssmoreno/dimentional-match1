@@ -162,7 +162,8 @@ export function getTimerStatus(timeRemaining, totalTime) {
 export function generateGameStats(gameState) {
   const { moves, matchedPairs, totalPairs, score, timeRemaining, level } = gameState;
   
-  const accuracy = moves > 0 ? Math.round((matchedPairs / (moves / 2)) * 100) : 0;
+  // Fórmula corregida: cada par coincidente = 2 cartas correctas, dividido por el total de cartas reveladas (moves)
+  const accuracy = moves > 0 ? Math.round((matchedPairs * 2 / moves) * 100) : 0;
   const efficiency = totalPairs > 0 ? Math.round((matchedPairs / totalPairs) * 100) : 0;
   
   return {

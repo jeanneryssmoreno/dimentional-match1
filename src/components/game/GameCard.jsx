@@ -2,8 +2,9 @@
  * Componente de carta del juego de memoria
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { CARD_STATES } from '../../types/game.js';
+import { useSoundEffects } from '../../hooks/useSoundEffects.js';
 
 /**
  * Componente de carta individual
@@ -13,14 +14,41 @@ const GameCard = ({
   onClick, 
   disabled = false, 
   className = '',
-  showHint = false 
+  showHint = false,
+  isShuffling = false,
+  audioEnabled = false
 }) => {
   const isRevealed = card.state === CARD_STATES.REVEALED || card.state === CARD_STATES.MATCHED;
   const isMatched = card.state === CARD_STATES.MATCHED;
   const isHidden = card.state === CARD_STATES.HIDDEN;
+  const [isFlipping, setIsFlipping] = useState(false);
+  const [previousState, setPreviousState] = useState(card.state);
+  
+  const { playFlipSound, playMatchSound } = useSoundEffects();
+
+  // Manejar animación de flip y sonidos cuando la carta cambia de estado
+  useEffect(() => {
+    // Sonido de flip cuando se revela
+    if (card.state === CARD_STATES.REVEALED && previousState === CARD_STATES.HIDDEN) {
+      setIsFlipping(true);
+      if (audioEnabled) {
+        playFlipSound();
+      }
+      setTimeout(() => setIsFlipping(false), 600);
+    }
+    
+    // Sonido de match cuando se encuentra pareja
+    if (card.state === CARD_STATES.MATCHED && previousState === CARD_STATES.REVEALED) {
+      if (audioEnabled) {
+        playMatchSound();
+      }
+    }
+    
+    setPreviousState(card.state);
+  }, [card.state, previousState, playFlipSound, playMatchSound, audioEnabled]);
 
   const handleClick = () => {
-    if (!disabled && isHidden && onClick) {
+    if (!disabled && !isShuffling && isHidden && onClick) {
       onClick(card.id);
     }
   };
@@ -34,14 +62,16 @@ const GameCard = ({
     // Estados de la carta
     isMatched && 'border-green-400 bg-green-50',
     isRevealed && !isMatched && 'border-blue-400 bg-blue-50',
-    isHidden && !disabled && 'hover:scale-105 hover:border-gray-300',
-    disabled && 'cursor-not-allowed opacity-75',
-    showHint && 'ring-2 ring-yellow-400 ring-opacity-75'
+    isHidden && !disabled && !isShuffling && 'hover:scale-105 hover:border-gray-300',
+    (disabled || isShuffling) && 'cursor-not-allowed',
+    showHint && 'ring-2 ring-yellow-400 ring-opacity-75',
+    // Animaciones de barajeo más intensas
+    isShuffling && 'transform-gpu will-change-transform'
   ].filter(Boolean).join(' ');
 
   return (
     <div
-      className={cardClasses}
+      className={`${cardClasses} perspective-1000`}
       onClick={handleClick}
       role="button"
       tabIndex={disabled ? -1 : 0}
@@ -53,12 +83,31 @@ const GameCard = ({
         }
       }}
     >
-      {/* Contenido de la carta */}
-      <div className="aspect-square p-2 flex flex-col">
-        {isRevealed ? (
-          // Carta revelada - mostrar imagen y nombre
-          <>
-            <div className="flex-1 flex items-center justify-center mb-2">
+      {/* Contenedor 3D para flip */}
+      <div className={`relative w-full h-full transition-transform duration-600 transform-style-preserve-3d ${
+        isRevealed || isFlipping ? 'rotate-y-180' : 'rotate-y-0'
+      }`}>
+        
+        {/* Cara trasera (dorso de la carta) */}
+        <div className="absolute inset-0 w-full h-full backface-hidden">
+          <div className="aspect-square p-2 flex flex-col">
+            <div className="flex-1 flex flex-col items-center justify-center">
+              <div className="w-full h-full bg-gradient-to-br from-blue-900 via-blue-800 to-black rounded-md flex flex-col items-center justify-center">
+                {/* Logo o patrón del dorso */}
+                <div className="text-white opacity-75 mb-2">
+                  <svg className="w-8 h-8 md:w-12 md:h-12" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Cara frontal (imagen de la carta) */}
+        <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180">
+          <div className="aspect-square p-2 flex flex-col">
+            <div className="flex-1 flex flex-col items-center justify-center mb-2">
               <img
                 src={card.image}
                 alt={card.name}
@@ -80,48 +129,31 @@ const GameCard = ({
             {/* Indicador de match */}
             {isMatched && (
               <div className="absolute top-1 right-1">
-                <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                <div className="w-6 h-6 bg-green-500 rounded-full flex flex-col items-center justify-center animate-bounce">
                   <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                 </div>
               </div>
             )}
-          </>
-        ) : (
-          // Carta oculta - mostrar dorso
-          <div className="flex-1 flex items-center justify-center">
-            <div className="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 rounded-md flex items-center justify-center">
-              {/* Logo o patrón del dorso */}
-              <div className="text-white opacity-75">
-                <svg className="w-8 h-8 md:w-12 md:h-12" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-              </div>
-            </div>
           </div>
-        )}
-
-        {/* Indicador de hint */}
-        {showHint && (
-          <div className="absolute top-1 left-1">
-            <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center animate-pulse">
-              <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-              </svg>
-            </div>
-          </div>
-        )}
-
-        {/* Efecto de carga para cartas que se están revelando */}
-        {card.state === CARD_STATES.REVEALED && (
-          <div className="absolute inset-0 bg-blue-200 bg-opacity-50 rounded-lg animate-pulse" />
-        )}
+        </div>
       </div>
+ 
+      {/* Indicador de hint */}
+      {showHint && (
+        <div className="absolute top-1 left-1 z-10">
+          <div className="w-6 h-6 bg-yellow-400 rounded-full flex flex-col items-center justify-center animate-pulse">
+            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+            </svg>
+          </div>
+        </div>
+      )}
 
       {/* Overlay para cartas deshabilitadas */}
       {disabled && (
-        <div className="absolute inset-0 bg-gray-500 bg-opacity-25 rounded-lg" />
+        <div className="absolute inset-0 bg-gray-500 bg-opacity-25 rounded-lg z-10" />
       )}
     </div>
   );
