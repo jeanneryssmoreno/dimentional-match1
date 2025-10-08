@@ -29,6 +29,7 @@ export function useGameLogic(theme, level = 1) {
     resumeGame,
     revealCard,
     resetGame,
+    shuffleCards,
     isGameActive,
     isGameComplete,
     isGameOver,
@@ -162,6 +163,7 @@ export function useGameLogic(theme, level = 1) {
     startNewGame,
     restartGame,
     togglePause,
+    shuffleCards,
     saveGame,
     loadGame,
     
