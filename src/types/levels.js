@@ -107,11 +107,11 @@ export const LEVEL_CONFIG = {
     cards: 14,
     time: 75, // 1:15
     difficulty: 'hard',
-    requiredAccuracy: 80,
+    requiredAccuracy: 70,
     unlockRequirements: {
       previousLevel: 3,
-      minScore: 1200,
-      minAccuracy: 80
+      minScore: 800,
+      minAccuracy: 70
     },
     rewards: {
       baseScore: 250,
@@ -138,11 +138,11 @@ export const LEVEL_CONFIG = {
     cards: 16,
     time: 60, // 1 minuto
     difficulty: 'expert',
-    requiredAccuracy: 90,
+    requiredAccuracy: 75,
     unlockRequirements: {
       previousLevel: 4,
-      minScore: 1800,
-      minAccuracy: 90
+      minScore: 1200,
+      minAccuracy: 75
     },
     rewards: {
       baseScore: 300,
