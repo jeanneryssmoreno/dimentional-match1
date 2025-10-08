@@ -1,8 +1,6 @@
-<<<<<<< HEAD
+
 import React, { useEffect, useState } from 'react';
-=======
-import React, { useEffect, useRef } from 'react';
->>>>>>> develop
+import { useRef } from 'react';
 import { useGameLogic } from '../../hooks/useGameLogic.js';
 import { useGameTimer } from '../../hooks/useGameTimer.js';
 import { useGameStats } from '../../hooks/useGameStats.js';
@@ -51,11 +49,9 @@ const GameBoard = ({ theme, level = 1, onGameComplete }) => {
   const {
     basicStats,
     progress,
-    performance,
-    getFormattedStats
   } = useGameStats();
 
-<<<<<<< HEAD
+
   const { playVictorySound, playShuffleSound } = useSoundEffects();
 
   // Activar audio con interacción del usuario
@@ -94,12 +90,12 @@ const GameBoard = ({ theme, level = 1, onGameComplete }) => {
   };
 
   // Notificar cuando el juego termine
-=======
+
   // Ref para evitar múltiples llamadas a onGameComplete
   const hasNotifiedCompletion = useRef(false);
 
   // Resetear la bandera cuando cambie el nivel
->>>>>>> develop
+
   useEffect(() => {
     hasNotifiedCompletion.current = false;
   }, [level, theme]);
