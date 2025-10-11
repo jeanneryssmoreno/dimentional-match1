@@ -22,6 +22,20 @@ import ScoreDisplay from './ScoreDisplay.jsx';
 const GameBoard = ({ theme, level = 1, onGameComplete }) => {
   const [showWinnerMessage, setShowWinnerMessage] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(false);
+  const [showScoreDetails, setShowScoreDetails] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detectar tamaño de pantalla para ajustar grid responsivo
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   const {
     gameState,
@@ -154,11 +168,32 @@ const GameBoard = ({ theme, level = 1, onGameComplete }) => {
     );
   }
 
-  // Calcular grid columns basado en el número de cartas
-  const getGridCols = (cardCount) => {
-    if (cardCount <= 8) return 'grid-cols-4';
-    if (cardCount <= 12) return 'grid-cols-4 md:grid-cols-6';
-    return 'grid-cols-4 md:grid-cols-6 lg:grid-cols-8';
+  // Calcular número óptimo de columnas basado en el número de cartas
+  const getOptimalCols = (cardCount) => {
+    // Encontrar todos los divisores del número de cartas
+    const divisors = [];
+    for (let i = 1; i <= cardCount; i++) {
+      if (cardCount % i === 0) {
+        divisors.push(i);
+      }
+    }
+    
+    // Buscar el divisor ideal entre 4 y 8 (buen balance visual)
+    for (let ideal = 4; ideal <= 8; ideal++) {
+      if (divisors.includes(ideal)) {
+        return ideal;
+      }
+    }
+    
+    // Si no hay divisor entre 4-8, buscar entre 3-10
+    for (let i = 3; i <= 10; i++) {
+      if (divisors.includes(i)) {
+        return i;
+      }
+    }
+    
+    // Último recurso: usar 4 (estándar)
+    return 4;
   };
 
   return (
@@ -197,17 +232,75 @@ const GameBoard = ({ theme, level = 1, onGameComplete }) => {
       <div className="relative z-10 max-w-6xl mx-auto p-4">
         {/* Header del juego */}
         <div className="mb-6 bg-black/20 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-bold text-white">
-                Nivel {level} - {theme.charAt(0).toUpperCase() + theme.slice(1)}
-              </h2>
-              <p className="text-white/80">
-                Encuentra {basicStats.totalPairs} pares de cartas
-              </p>
+          {/* Fila superior: Información y controles */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+            {/* Información del nivel y pares - lado a lado */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 flex-1">
+              {/* Lado izquierdo: Nivel y tema */}
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-white">
+                  Nivel {level} - {theme.charAt(0).toUpperCase() + theme.slice(1)}
+                </h2>
+              </div>
+              
+              {/* Lado derecho: Objetivo de pares */}
+              <div className="flex-1 text-left sm:text-right">
+                <p className="text-lg font-semibold text-white/90">
+                  Encuentra {basicStats.totalPairs} pares de cartas
+                </p>
+              </div>
             </div>
             
+            {/* Controles del lado derecho */}
             <div className="flex items-center gap-4">
+              {/* Botón de control del juego (Iniciar/Pausar/Continuar) */}
+              <div className="flex items-center gap-2">
+                {gameState.status === GAME_STATES.IDLE && (
+                  <button
+                    onClick={startNewGame}
+                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2 font-semibold shadow-lg"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                    </svg>
+                    Iniciar Juego
+                  </button>
+                )}
+                {gameState.status === GAME_STATES.PLAYING && (
+                  <button
+                    onClick={togglePause}
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2 font-semibold shadow-lg"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    Pausar
+                  </button>
+                )}
+                {gameState.status === GAME_STATES.PAUSED && (
+                  <button
+                    onClick={togglePause}
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2 font-semibold shadow-lg"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                    </svg>
+                    Continuar
+                  </button>
+                )}
+                {(gameState.status === GAME_STATES.COMPLETED || gameState.status === GAME_STATES.GAME_OVER) && (
+                  <button
+                    onClick={startNewGame}
+                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2 font-semibold shadow-lg"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+                    </svg>
+                    Nuevo Juego
+                  </button>
+                )}
+              </div>
+              
               {/* Botón de activación de audio */}
               {!audioEnabled && (
                 <button
@@ -230,91 +323,72 @@ const GameBoard = ({ theme, level = 1, onGameComplete }) => {
             </div>
           </div>
 
-          {/* Barra de progreso */}
-          <div className="mt-4">
-            <div className="flex justify-between text-sm text-white/80 mb-1">
-              <span>Progreso</span>
-              <span>{basicStats.matchedPairs}/{basicStats.totalPairs} pares</span>
+          {/* Fila inferior: Barra de progreso y botones de acción */}
+          <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+            {/* Barra de progreso - ancho limitado */}
+            <div className="flex-1">
+              <div className="flex justify-between text-sm text-white/80 mb-2">
+                <span className="font-semibold">Progreso</span>
+                <span className="font-semibold">{basicStats.matchedPairs}/{basicStats.totalPairs} pares ({Math.round(progress.progress)}%)</span>
+              </div>
+              <div className="w-full bg-white/20 rounded-full h-3">
+                <div
+                  className="bg-gradient-to-r from-green-400 to-blue-400 h-3 rounded-full transition-all duration-300 shadow-lg"
+                  style={{ width: `${progress.progress}%` }}
+                />
+              </div>
             </div>
-            <div className="w-full bg-white/20 rounded-full h-2">
-              <div
-                className="bg-gradient-to-r from-green-400 to-blue-400 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${progress.progress}%` }}
-              />
-            </div>
+
+            {/* Botones de acción: Barajear y Reiniciar */}
+            {(isGameActive || isGameComplete || isGameOver) && (
+              <div className="flex flex-wrap gap-3 justify-center lg:justify-end">
+                {/* Botón de barajeo */}
+                {isGameActive && (
+                  <button
+                    onClick={shuffleCards}
+                    disabled={gameState.isShuffling}
+                    className={`px-4 py-2 rounded-lg font-bold text-white transition-all duration-300 transform hover:scale-105 ${
+                      gameState.isShuffling
+                        ? 'bg-gray-500 cursor-not-allowed opacity-50'
+                        : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-purple-500/30'
+                    }`}
+                  >
+                    {gameState.isShuffling ? (
+                      <span className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Barajeando...
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-2">
+                        <span className="text-lg">🔀</span>
+                        <span className="text-sm">Barajear</span>
+                      </span>
+                    )}
+                  </button>
+                )}
+
+                {/* Botón de reiniciar */}
+                {(gameState.status === GAME_STATES.PLAYING || gameState.status === GAME_STATES.PAUSED) && (
+                  <button
+                    onClick={restartGame}
+                    disabled={gameState.isShuffling}
+                    className={`px-4 py-2 rounded-lg font-bold text-white transition-all duration-300 transform hover:scale-105 ${
+                      gameState.isShuffling
+                        ? 'bg-gray-500 cursor-not-allowed opacity-50'
+                        : 'bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 shadow-lg hover:shadow-red-500/30'
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+                      </svg>
+                      <span className="text-sm">Reiniciar</span>
+                    </span>
+                  </button>
+                )}
+              </div>
+            )}
           </div>
-        </div>
-
-        {/* Controles del juego */}
-        <div className="flex flex-wrap gap-4 justify-center mb-6 bg-black/20 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
-          <GameControls
-            gameState={gameState}
-            onStart={startNewGame}
-            onRestart={restartGame}
-            onPause={togglePause}
-            isLoading={isLoading}
-          />
-          
-          {/* Botón de barajeo épico */}
-          {isGameActive && (
-            <button
-              onClick={shuffleCards}
-              disabled={gameState.isShuffling}
-              className={`px-8 py-4 rounded-xl font-bold text-white transition-all duration-300 transform hover:scale-110 ${
-                gameState.isShuffling
-                  ? 'bg-gray-500 cursor-not-allowed opacity-50'
-                  : 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 hover:from-purple-700 hover:via-pink-700 hover:to-blue-700 shadow-2xl hover:shadow-purple-500/50 animate-pulse'
-              }`}
-            >
-              {gameState.isShuffling ? (
-                <span className="flex items-center gap-3">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Barajeando...
-                </span>
-              ) : (
-                <span className="flex items-center gap-3">
-                  <span className="text-2xl animate-bounce">🔀</span>
-                  <span className="text-lg">BARAJEAR</span>
-                  <span className="text-2xl animate-bounce" style={{ animationDelay: '0.2s' }}>🎲</span>
-                </span>
-              )}
-            </button>
-          )}
-
-          {/* Botón de RESET más pequeño */}
-          {(isGameActive || isGameComplete || isGameOver) && (
-            <button
-              onClick={() => {
-                restartGame();
-                // El barajeo automático se ejecutará cuando se inicie el nuevo juego
-              }}
-              disabled={gameState.isShuffling}
-              className={`px-4 py-2 rounded-lg font-bold text-white transition-all duration-300 transform hover:scale-105 ${
-                gameState.isShuffling
-                  ? 'bg-gray-500 cursor-not-allowed opacity-50'
-                  : 'bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 shadow-lg hover:shadow-red-500/30'
-              }`}
-            >
-              <span className="flex items-center gap-2">
-                <span className="text-lg">🔄</span>
-                <span className="text-sm">Restablecer Puntos</span>
-              </span>
-            </button>
-          )}
-        </div>
-
-        {/* Sistema de puntuación avanzado */}
-        <div className="mb-6">
-          <ScoreDisplay
-            score={basicStats.score}
-            moves={basicStats.moves}
-            matchedPairs={basicStats.matchedPairs}
-            totalPairs={basicStats.totalPairs}
-            timeBonus={Math.floor(basicStats.score * 0.2)}
-            streakBonus={Math.floor(basicStats.score * 0.1)}
-            accuracy={basicStats.accuracy}
-            className="bg-black/30 backdrop-blur-sm border border-white/10"
-          />
         </div>
 
         {/* Tablero de cartas */}
@@ -324,9 +398,16 @@ const GameBoard = ({ theme, level = 1, onGameComplete }) => {
             <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-blue-500/20 rounded-xl z-10 animate-pulse"></div>
           )}
           
-          <div className={`grid ${getGridCols(cards.length)} gap-3 md:gap-4 relative ${
-            gameState.isShuffling ? 'shuffle-wave' : ''
-          }`}>
+          <div 
+            className={`grid gap-3 md:gap-4 relative ${
+              gameState.isShuffling ? 'shuffle-wave' : ''
+            }`}
+            style={{
+              gridTemplateColumns: isMobile 
+                ? `repeat(${Math.min(getOptimalCols(cards.length), 4)}, minmax(0, 1fr))` 
+                : `repeat(${getOptimalCols(cards.length)}, minmax(0, 1fr))`
+            }}
+          >
             {cards.map((card, index) => (
               <div
                 key={card.id}
@@ -390,6 +471,50 @@ const GameBoard = ({ theme, level = 1, onGameComplete }) => {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Sistema de puntuación avanzado - Desplegable */}
+        <div className="mb-6">
+          <button
+            onClick={() => setShowScoreDetails(!showScoreDetails)}
+            className="w-full bg-black/30 backdrop-blur-sm border border-white/10 rounded-t-2xl px-6 py-4 flex items-center justify-between text-white hover:bg-black/40 transition-all duration-300"
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">📊</span>
+              <span className="text-lg font-bold">Puntuación y Estadísticas</span>
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-400 text-black px-3 py-1 rounded-full text-sm font-bold">
+                {basicStats.score} pts
+              </span>
+            </div>
+            <svg 
+              className={`w-6 h-6 transition-transform duration-300 ${showScoreDetails ? 'rotate-180' : ''}`}
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          {/* Contenido desplegable */}
+          <div 
+            className={`overflow-hidden transition-all duration-300 ${
+              showScoreDetails ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+            }`}
+          >
+            <div className="bg-black/30 backdrop-blur-sm border border-t-0 border-white/10 rounded-b-2xl p-4">
+              <ScoreDisplay
+                score={basicStats.score}
+                moves={basicStats.moves}
+                matchedPairs={basicStats.matchedPairs}
+                totalPairs={basicStats.totalPairs}
+                timeBonus={Math.floor(basicStats.score * 0.2)}
+                streakBonus={Math.floor(basicStats.score * 0.1)}
+                accuracy={basicStats.accuracy}
+                className="bg-transparent border-0"
+              />
+            </div>
+          </div>
         </div>
 
         {/* Mensajes de estado */}
