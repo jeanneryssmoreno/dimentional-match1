@@ -10,12 +10,13 @@
  * - Modales de victoria/derrota
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { THEME_LIST } from '../constants/themes';
 import { useLevelProgress } from '../hooks/useLevelProgress';
 import { useGamePersistence } from '../hooks/useGamePersistence';
 import { useGame } from '../contexts/GameContext';
+import { getLevelConfig, isLevelUnlocked } from '../types/levels';
 import GameBoard from '../components/game/GameBoard';
 import VictoryModal from '../components/game/VictoryModal';
 import GameOverModal from '../components/game/GameOverModal';
@@ -239,6 +240,56 @@ export default function Game() {
   const currentLevelStats = getLevelStats(currentLevel);
   const bestScore = currentLevelStats.bestScore || 0;
 
+  /**
+   * Valida si el jugador puede acceder al siguiente nivel
+   * basándose en los requisitos de puntuación y precisión
+   */
+  const nextLevelValidation = useMemo(() => {
+    // Si no hay resultado o no está en el último nivel
+    if (!lastGameResult || currentLevel >= 5) {
+      return { canAccess: false, requirements: null, nextLevelConfig: null };
+    }
+
+    const nextLevelId = currentLevel + 1;
+    const nextLevelConfig = getLevelConfig(nextLevelId);
+    
+    // Simular el progreso actualizado con el resultado actual del juego
+    // Usamos el mejor score entre el actual y los anteriores
+    const currentBestScore = Math.max(
+      lastGameResult.score || 0,
+      playerProgress[currentLevel]?.bestScore || 0
+    );
+    
+    const currentBestAccuracy = Math.max(
+      lastGameResult.accuracy || 0,
+      playerProgress[currentLevel]?.bestAccuracy || 0
+    );
+
+    const simulatedProgress = {
+      ...playerProgress,
+      [currentLevel]: {
+        ...playerProgress[currentLevel],
+        completed: true,
+        bestScore: currentBestScore,
+        bestAccuracy: currentBestAccuracy
+      }
+    };
+    
+    // Verificar si el siguiente nivel está desbloqueado
+    const canAccess = isLevelUnlocked(nextLevelId, simulatedProgress);
+    
+    // Obtener requisitos del siguiente nivel
+    const requirements = nextLevelConfig.unlockRequirements;
+    
+    return {
+      canAccess,
+      requirements,
+      nextLevelConfig,
+      currentScore: currentBestScore,
+      currentAccuracy: currentBestAccuracy
+    };
+  }, [currentLevel, lastGameResult, playerProgress]);
+
   // Si no hay tema seleccionado, no renderizar nada
   if (!selectedTheme) {
     return null;
@@ -286,18 +337,35 @@ export default function Game() {
         </div>
       )}
 
-      {/* Header simplificado para selector de niveles */}
+      {/* Header con botón de volver para selector de niveles */}
       {screenState === SCREEN_STATES.LEVEL_SELECT && (
-        <div className="mb-8 text-center">
-          <div className="inline-flex items-center gap-3 bg-white dark:bg-gray-800 rounded-full px-6 py-3 shadow-lg">
-            <span className="text-3xl">{selectedTheme.icon}</span>
-            <div className="text-left">
-              <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
-                {selectedTheme.name}
-              </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-300">
-                Nivel {currentLevel} de 5
-              </p>
+        <div className="mb-8">
+          <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4">
+            {/* Espacio flexible izquierdo */}
+            <div className="flex-1"></div>
+            
+            {/* Título del tema en el centro */}
+            <div className="flex items-center gap-3 bg-white dark:bg-gray-800 rounded-full px-6 py-3 shadow-lg">
+              <span className="text-3xl">{selectedTheme.icon}</span>
+              <div className="text-left">
+                <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+                  {selectedTheme.name}
+                </h2>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  Nivel {currentLevel} de 5
+                </p>
+              </div>
+            </div>
+            
+            {/* Botón volver a la derecha */}
+            <div className="flex-1 flex justify-end">
+              <Button
+                onClick={handleBackToHome}
+                variant="outline"
+                size="medium"
+              >
+                ← Volver al Menú
+              </Button>
             </div>
           </div>
         </div>
@@ -322,32 +390,12 @@ export default function Game() {
 
       {/* Selector de Niveles */}
       {screenState === SCREEN_STATES.LEVEL_SELECT && showLevelSelector && (
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
-              Selecciona un Nivel
-            </h3>
-            <p className="text-gray-600 dark:text-gray-300">
-              Elige el nivel que quieres jugar
-            </p>
-          </div>
-
+        <div className="max-w-7xl mx-auto px-4">
           <LevelSelector
             playerProgress={playerProgress}
             onLevelSelect={handleLevelSelect}
             currentTheme={themeId}
           />
-
-          {/* Botón volver */}
-          <div className="text-center mt-8">
-            <Button
-              onClick={handleBackToHome}
-              variant="outline"
-              size="large"
-            >
-              ← Volver al Menú
-            </Button>
-          </div>
         </div>
       )}
 
@@ -384,6 +432,10 @@ export default function Game() {
         onRetry={handleRetry}
         onBackToHome={handleBackToHome}
         isLastLevel={currentLevel === 5}
+        canGoToNextLevel={nextLevelValidation.canAccess}
+        nextLevelRequirements={nextLevelValidation.requirements}
+        currentScore={nextLevelValidation.currentScore}
+        currentAccuracy={nextLevelValidation.currentAccuracy}
       />
 
       {/* Modal de Game Over */}
