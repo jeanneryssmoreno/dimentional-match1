@@ -246,20 +246,79 @@ export default function Game() {
 
   return (
     <div className="min-h-screen">
-      {/* Header con información del tema */}
-      <div className="mb-8 text-center">
-        <div className="inline-flex items-center gap-3 bg-white dark:bg-gray-800 rounded-full px-6 py-3 shadow-lg">
-          <span className="text-3xl">{selectedTheme.icon}</span>
-          <div className="text-left">
-            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
-              {selectedTheme.name}
-            </h2>
-            <p className="text-sm text-gray-600 dark:text-gray-300">
-              Nivel {currentLevel} de 5
-            </p>
+      {/* Header con información del tema y botones de navegación */}
+      {screenState === SCREEN_STATES.PLAYING && (
+        <div className="mb-8">
+          <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4">
+            {/* Botón izquierdo: Cambiar Nivel */}
+            <Button
+              onClick={handleBackToLevelSelect}
+              variant="outline"
+              size="medium"
+            >
+              ← Cambiar Nivel
+            </Button>
+
+            {/* Título del tema en el centro */}
+            <div className="flex-1 flex justify-center">
+              <div className="inline-flex items-center gap-3 bg-white dark:bg-gray-800 rounded-full px-6 py-3 shadow-lg">
+                <span className="text-3xl">{selectedTheme.icon}</span>
+                <div className="text-left">
+                  <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+                    {selectedTheme.name}
+                  </h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    Nivel {currentLevel} de 5
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Botón derecho: Menú Principal */}
+            <Button
+              onClick={handleBackToHome}
+              variant="outline"
+              size="medium"
+            >
+              🏠 Menú Principal
+            </Button>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Header simplificado para selector de niveles */}
+      {screenState === SCREEN_STATES.LEVEL_SELECT && (
+        <div className="mb-8 text-center">
+          <div className="inline-flex items-center gap-3 bg-white dark:bg-gray-800 rounded-full px-6 py-3 shadow-lg">
+            <span className="text-3xl">{selectedTheme.icon}</span>
+            <div className="text-left">
+              <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+                {selectedTheme.name}
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                Nivel {currentLevel} de 5
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Header simplificado para estado de carga */}
+      {screenState === SCREEN_STATES.LOADING && (
+        <div className="mb-8 text-center">
+          <div className="inline-flex items-center gap-3 bg-white dark:bg-gray-800 rounded-full px-6 py-3 shadow-lg">
+            <span className="text-3xl">{selectedTheme.icon}</span>
+            <div className="text-left">
+              <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+                {selectedTheme.name}
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                Nivel {currentLevel} de 5
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Selector de Niveles */}
       {screenState === SCREEN_STATES.LEVEL_SELECT && showLevelSelector && (
@@ -307,24 +366,6 @@ export default function Game() {
       {/* Tablero de Juego */}
       {screenState === SCREEN_STATES.PLAYING && (
         <div>
-          {/* Botón para volver al selector */}
-          <div className="max-w-6xl mx-auto mb-4 flex justify-between items-center px-4">
-            <Button
-              onClick={handleBackToLevelSelect}
-              variant="outline"
-              size="small"
-            >
-              ← Cambiar Nivel
-            </Button>
-            <Button
-              onClick={handleBackToHome}
-              variant="outline"
-              size="small"
-            >
-              🏠 Menú Principal
-            </Button>
-          </div>
-
           <GameBoard
             key={`${themeId}-${currentLevel}`}
             theme={themeId}
