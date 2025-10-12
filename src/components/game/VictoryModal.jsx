@@ -14,7 +14,11 @@ const VictoryModal = ({
   onNextLevel, 
   onRetry,
   onBackToHome,
-  isLastLevel = false 
+  isLastLevel = false,
+  canGoToNextLevel = true,
+  nextLevelRequirements = null,
+  currentScore = 0,
+  currentAccuracy = 0
 }) => {
   if (!gameResult) return null;
 
@@ -157,6 +161,65 @@ const VictoryModal = ({
           </div>
         </div>
 
+        {/* Mensaje de requisitos no cumplidos */}
+        {!isLastLevel && onNextLevel && !canGoToNextLevel && nextLevelRequirements && (
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-700 rounded-lg">
+            <div className="flex items-start gap-3">
+              <div className="text-3xl">🔒</div>
+              <div className="flex-1">
+                <h4 className="font-bold text-red-800 dark:text-red-300 mb-2">
+                  Siguiente Nivel Bloqueado
+                </h4>
+                <p className="text-sm text-red-700 dark:text-red-400 mb-3">
+                  Para desbloquear el siguiente nivel necesitas cumplir estos requisitos:
+                </p>
+                <div className="space-y-2">
+                  {/* Requisito de puntuación */}
+                  {nextLevelRequirements.minScore > 0 && (
+                    <div className={`flex items-center gap-2 text-sm ${
+                      currentScore >= nextLevelRequirements.minScore
+                        ? 'text-green-700 dark:text-green-400'
+                        : 'text-red-700 dark:text-red-400'
+                    }`}>
+                      <span className="text-lg">
+                        {currentScore >= nextLevelRequirements.minScore ? '✅' : '❌'}
+                      </span>
+                      <span className="font-medium">
+                        Puntuación mínima: {nextLevelRequirements.minScore.toLocaleString()}
+                      </span>
+                      <span className="text-gray-600 dark:text-gray-400">
+                        (Tienes: {currentScore.toLocaleString()})
+                      </span>
+                    </div>
+                  )}
+                  
+                  {/* Requisito de precisión */}
+                  {nextLevelRequirements.minAccuracy > 0 && (
+                    <div className={`flex items-center gap-2 text-sm ${
+                      currentAccuracy >= nextLevelRequirements.minAccuracy
+                        ? 'text-green-700 dark:text-green-400'
+                        : 'text-red-700 dark:text-red-400'
+                    }`}>
+                      <span className="text-lg">
+                        {currentAccuracy >= nextLevelRequirements.minAccuracy ? '✅' : '❌'}
+                      </span>
+                      <span className="font-medium">
+                        Precisión mínima: {nextLevelRequirements.minAccuracy}%
+                      </span>
+                      <span className="text-gray-600 dark:text-gray-400">
+                        (Tienes: {currentAccuracy}%)
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <p className="text-sm text-red-600 dark:text-red-400 mt-3 font-medium">
+                  💡 Intenta jugar de nuevo para mejorar tu puntuación
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Botones de Acción */}
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           {!isLastLevel && onNextLevel && (
@@ -164,9 +227,14 @@ const VictoryModal = ({
               onClick={onNextLevel}
               variant="primary"
               size="large"
-              className="bg-green-500 hover:bg-green-600"
+              className={
+                canGoToNextLevel
+                  ? "bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700"
+                  : "bg-gray-300 dark:bg-gray-600 cursor-not-allowed opacity-50"
+              }
+              disabled={!canGoToNextLevel}
             >
-              ➡️ Siguiente Nivel
+              {canGoToNextLevel ? '➡️ Siguiente Nivel' : '🔒 Nivel Bloqueado'}
             </Button>
           )}
           

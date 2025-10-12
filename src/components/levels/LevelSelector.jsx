@@ -60,16 +60,9 @@ const LevelSelector = ({
   };
 
   return (
-    <div className={`max-w-6xl mx-auto p-6 ${className}`}>
-      {/* Header con progreso general */}
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-800 mb-2">
-          Seleccionar Nivel
-        </h2>
-        <p className="text-gray-600 mb-4">
-          Elige tu nivel de dificultad y demuestra tus habilidades
-        </p>
-        
+    <div className={`w-full ${className}`}>
+      {/* Resumen de progreso general */}
+      <div className="mb-8">
         <ProgressSummary 
           progress={overallProgress}
           onToggleDetails={() => setShowDetails(!showDetails)}
@@ -77,8 +70,8 @@ const LevelSelector = ({
         />
       </div>
 
-      {/* Grid de niveles */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
+      {/* Grid de niveles - distribución mejorada */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 mb-8">
         {allLevels.map((level) => {
           const status = getLevelUnlockStatus(level.id, playerProgress);
           const isSelected = selectedLevel === level.id;
@@ -99,12 +92,12 @@ const LevelSelector = ({
 
       {/* Detalles del nivel seleccionado */}
       {selectedLevel && (
-        <div className="bg-white rounded-lg shadow-lg p-6 border-2 border-blue-200">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 border-2 border-blue-200 dark:border-blue-700">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Información del nivel */}
             <div>
-              <div className="flex items-center gap-3 mb-4">
-                <h3 className="text-2xl font-bold text-gray-800">
+              <div className="flex flex-wrap items-center gap-3 mb-4">
+                <h3 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100">
                   Nivel {selectedLevel}: {allLevels.find(l => l.id === selectedLevel)?.name}
                 </h3>
                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${
@@ -114,34 +107,34 @@ const LevelSelector = ({
                 </span>
               </div>
               
-              <p className="text-gray-600 mb-4">
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
                 {allLevels.find(l => l.id === selectedLevel)?.description}
               </p>
 
               {/* Estadísticas del nivel */}
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <div className="text-sm text-gray-600">Cartas</div>
-                  <div className="text-xl font-bold text-gray-800">
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Cartas</div>
+                  <div className="text-xl font-bold text-gray-800 dark:text-gray-100">
                     {allLevels.find(l => l.id === selectedLevel)?.cards}
                   </div>
                 </div>
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <div className="text-sm text-gray-600">Tiempo</div>
-                  <div className="text-xl font-bold text-gray-800">
+                <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Tiempo</div>
+                  <div className="text-xl font-bold text-gray-800 dark:text-gray-100">
                     {Math.floor(allLevels.find(l => l.id === selectedLevel)?.time / 60)}:
                     {(allLevels.find(l => l.id === selectedLevel)?.time % 60).toString().padStart(2, '0')}
                   </div>
                 </div>
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <div className="text-sm text-gray-600">Pares</div>
-                  <div className="text-xl font-bold text-gray-800">
+                <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Pares</div>
+                  <div className="text-xl font-bold text-gray-800 dark:text-gray-100">
                     {allLevels.find(l => l.id === selectedLevel)?.pairs}
                   </div>
                 </div>
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <div className="text-sm text-gray-600">Pistas</div>
-                  <div className="text-xl font-bold text-gray-800">
+                <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Pistas</div>
+                  <div className="text-xl font-bold text-gray-800 dark:text-gray-100">
                     {allLevels.find(l => l.id === selectedLevel)?.hints.available 
                       ? allLevels.find(l => l.id === selectedLevel)?.hints.maxHints
                       : 'No'
@@ -153,30 +146,30 @@ const LevelSelector = ({
 
             {/* Progreso y recompensas */}
             <div>
-              <h4 className="text-lg font-semibold text-gray-800 mb-3">
+              <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">
                 Progreso y Recompensas
               </h4>
               
               {/* Progreso personal */}
               {playerProgress[selectedLevel] && (
-                <div className="bg-blue-50 p-4 rounded-lg mb-4">
-                  <h5 className="font-medium text-blue-800 mb-2">Tu Mejor Resultado</h5>
+                <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg mb-4">
+                  <h5 className="font-medium text-blue-800 dark:text-blue-300 mb-2">Tu Mejor Resultado</h5>
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div>
-                      <span className="text-blue-600">Puntuación:</span>
-                      <span className="font-bold ml-2">
+                      <span className="text-blue-600 dark:text-blue-400">Puntuación:</span>
+                      <span className="font-bold ml-2 dark:text-gray-100">
                         {playerProgress[selectedLevel].bestScore?.toLocaleString() || 0}
                       </span>
                     </div>
                     <div>
-                      <span className="text-blue-600">Precisión:</span>
-                      <span className="font-bold ml-2">
+                      <span className="text-blue-600 dark:text-blue-400">Precisión:</span>
+                      <span className="font-bold ml-2 dark:text-gray-100">
                         {playerProgress[selectedLevel].bestAccuracy || 0}%
                       </span>
                     </div>
                     <div>
-                      <span className="text-blue-600">Tiempo:</span>
-                      <span className="font-bold ml-2">
+                      <span className="text-blue-600 dark:text-blue-400">Tiempo:</span>
+                      <span className="font-bold ml-2 dark:text-gray-100">
                         {playerProgress[selectedLevel].bestTime 
                           ? `${Math.floor(playerProgress[selectedLevel].bestTime / 60)}:${(playerProgress[selectedLevel].bestTime % 60).toString().padStart(2, '0')}`
                           : '--:--'
@@ -184,8 +177,8 @@ const LevelSelector = ({
                       </span>
                     </div>
                     <div>
-                      <span className="text-blue-600">Intentos:</span>
-                      <span className="font-bold ml-2">
+                      <span className="text-blue-600 dark:text-blue-400">Intentos:</span>
+                      <span className="font-bold ml-2 dark:text-gray-100">
                         {playerProgress[selectedLevel].attempts || 0}
                       </span>
                     </div>
@@ -194,24 +187,24 @@ const LevelSelector = ({
               )}
 
               {/* Recompensas */}
-              <div className="bg-yellow-50 p-4 rounded-lg">
-                <h5 className="font-medium text-yellow-800 mb-2">Recompensas Posibles</h5>
+              <div className="bg-yellow-50 dark:bg-yellow-900/30 p-4 rounded-lg">
+                <h5 className="font-medium text-yellow-800 dark:text-yellow-300 mb-2">Recompensas Posibles</h5>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-yellow-600">Puntos base:</span>
-                    <span className="font-bold">
+                    <span className="text-yellow-600 dark:text-yellow-400">Puntos base:</span>
+                    <span className="font-bold dark:text-gray-100">
                       {allLevels.find(l => l.id === selectedLevel)?.rewards.baseScore}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-yellow-600">Bonus tiempo:</span>
-                    <span className="font-bold">
+                    <span className="text-yellow-600 dark:text-yellow-400">Bonus tiempo:</span>
+                    <span className="font-bold dark:text-gray-100">
                       hasta {allLevels.find(l => l.id === selectedLevel)?.rewards.timeBonus}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-yellow-600">Bonus perfecto:</span>
-                    <span className="font-bold">
+                    <span className="text-yellow-600 dark:text-yellow-400">Bonus perfecto:</span>
+                    <span className="font-bold dark:text-gray-100">
                       {allLevels.find(l => l.id === selectedLevel)?.rewards.perfectBonus}
                     </span>
                   </div>
@@ -220,9 +213,9 @@ const LevelSelector = ({
 
               {/* Requisitos de desbloqueo */}
               {allLevels.find(l => l.id === selectedLevel)?.unlockRequirements.previousLevel && (
-                <div className="bg-gray-50 p-4 rounded-lg mt-4">
-                  <h5 className="font-medium text-gray-800 mb-2">Requisitos</h5>
-                  <div className="space-y-1 text-sm text-gray-600">
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mt-4">
+                  <h5 className="font-medium text-gray-800 dark:text-gray-100 mb-2">Requisitos</h5>
+                  <div className="space-y-1 text-sm text-gray-600 dark:text-gray-300">
                     <div>
                       Completar nivel {allLevels.find(l => l.id === selectedLevel)?.unlockRequirements.previousLevel}
                     </div>
@@ -243,14 +236,14 @@ const LevelSelector = ({
             {getLevelUnlockStatus(selectedLevel, playerProgress) === UNLOCK_STATUS.LOCKED ? (
               <button 
                 disabled 
-                className="bg-gray-300 text-gray-500 px-8 py-3 rounded-lg font-medium cursor-not-allowed"
+                className="bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 px-8 py-3 rounded-lg font-medium cursor-not-allowed"
               >
                 🔒 Nivel Bloqueado
               </button>
             ) : (
               <button 
                 onClick={() => onLevelSelect && onLevelSelect(selectedLevel)}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-medium transition-colors"
+                className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl transform hover:scale-105 transition-transform"
               >
                 {getLevelUnlockStatus(selectedLevel, playerProgress) === UNLOCK_STATUS.COMPLETED 
                   ? '🔄 Jugar de Nuevo' 
