@@ -42,182 +42,204 @@ const ProgressSummary = ({
   const playerRank = getPlayerRank(completionPercentage, perfectPercentage);
 
   return (
-    <div className={`bg-white rounded-lg shadow-md border border-gray-200 ${className}`}>
-      {/* Header compacto */}
-      <div 
-        className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
-        onClick={onToggleDetails}
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            {/* Rango del jugador */}
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">{playerRank.icon}</span>
-              <div>
-                <div className={`font-bold ${playerRank.color}`}>
-                  {playerRank.rank}
+    <div className={`relative ${className}`}>
+      {/* Efectos de borde neón */}
+      <div className="absolute -inset-4 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 blur-xl rounded-3xl animate-pulse"></div>
+      
+      <div className="relative bg-black/20 backdrop-blur-sm rounded-3xl border border-white/10 shadow-xl">
+        {/* Header compacto */}
+        <div 
+          className="p-6 cursor-pointer hover:bg-white/5 transition-colors rounded-t-3xl"
+          onClick={onToggleDetails}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-6">
+              {/* Rango del jugador */}
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/30 to-orange-500/30 blur-lg rounded-full animate-pulse"></div>
+                  <span className="relative text-4xl animate-bounce">{playerRank.icon}</span>
                 </div>
-                <div className="text-sm text-gray-600">
-                  {completedLevels}/{totalLevels} niveles
-                </div>
-              </div>
-            </div>
-
-            {/* Barra de progreso principal */}
-            <div className="flex-1 max-w-xs">
-              <div className="flex justify-between text-sm text-gray-600 mb-1">
-                <span>Progreso General</span>
-                <span>{completionPercentage}%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-3">
-                <div 
-                  className={`h-3 rounded-full transition-all duration-500 ${getProgressColor(completionPercentage)}`}
-                  style={{ width: `${completionPercentage}%` }}
-                />
-              </div>
-            </div>
-
-            {/* Puntuación total */}
-            <div className="text-right">
-              <div className="text-lg font-bold text-gray-800">
-                {totalScore.toLocaleString()}
-              </div>
-              <div className="text-sm text-gray-600">
-                Puntos totales
-              </div>
-            </div>
-          </div>
-
-          {/* Indicador de expansión */}
-          <div className="ml-4">
-            <svg 
-              className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${
-                showDetails ? 'rotate-180' : ''
-              }`} 
-              fill="currentColor" 
-              viewBox="0 0 20 20"
-            >
-              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
-          </div>
-        </div>
-      </div>
-
-      {/* Detalles expandibles */}
-      {showDetails && (
-        <div className="px-4 pb-4 border-t border-gray-100">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-            {/* Estadística: Niveles completados */}
-            <div className="text-center p-3 bg-blue-50 rounded-lg">
-              <div className="text-2xl font-bold text-blue-600">
-                {completedLevels}
-              </div>
-              <div className="text-sm text-blue-800">
-                Completados
-              </div>
-              <div className="text-xs text-blue-600">
-                de {totalLevels} totales
-              </div>
-            </div>
-
-            {/* Estadística: Niveles perfectos */}
-            <div className="text-center p-3 bg-yellow-50 rounded-lg">
-              <div className="text-2xl font-bold text-yellow-600">
-                {perfectLevels}
-              </div>
-              <div className="text-sm text-yellow-800">
-                Perfectos
-              </div>
-              <div className="text-xs text-yellow-600">
-                {perfectPercentage}% del total
-              </div>
-            </div>
-
-            {/* Estadística: Puntuación promedio */}
-            <div className="text-center p-3 bg-green-50 rounded-lg">
-              <div className="text-2xl font-bold text-green-600">
-                {averageScore.toLocaleString()}
-              </div>
-              <div className="text-sm text-green-800">
-                Promedio
-              </div>
-              <div className="text-xs text-green-600">
-                por nivel
-              </div>
-            </div>
-
-            {/* Estadística: Eficiencia */}
-            <div className="text-center p-3 bg-purple-50 rounded-lg">
-              <div className="text-2xl font-bold text-purple-600">
-                {Math.round((perfectLevels / Math.max(completedLevels, 1)) * 100)}%
-              </div>
-              <div className="text-sm text-purple-800">
-                Eficiencia
-              </div>
-              <div className="text-xs text-purple-600">
-                perfectos/completados
-              </div>
-            </div>
-          </div>
-
-          {/* Logros y badges */}
-          <div className="mt-4">
-            <h4 className="text-sm font-medium text-gray-700 mb-2">Logros Desbloqueados</h4>
-            <div className="flex flex-wrap gap-2">
-              {completedLevels >= 1 && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
-                  🎯 Primer Nivel
-                </span>
-              )}
-              {completedLevels >= 3 && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
-                  🔥 En Racha
-                </span>
-              )}
-              {perfectLevels >= 1 && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
-                  ⭐ Perfeccionista
-                </span>
-              )}
-              {completedLevels === totalLevels && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-purple-100 text-purple-800">
-                  👑 Completista
-                </span>
-              )}
-              {perfectLevels === totalLevels && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-800">
-                  🏆 Maestro Absoluto
-                </span>
-              )}
-              {completedLevels === 0 && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-600">
-                  🎮 ¡Comienza tu aventura!
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Próximo objetivo */}
-          {completedLevels < totalLevels && (
-            <div className="mt-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
-              <div className="flex items-center gap-2">
-                <span className="text-blue-600">🎯</span>
                 <div>
-                  <div className="text-sm font-medium text-blue-800">
-                    Próximo Objetivo
+                  <div className={`text-xl font-black bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent`}>
+                    {playerRank.rank}
                   </div>
-                  <div className="text-xs text-blue-600">
-                    {completedLevels === 0 
-                      ? 'Completa tu primer nivel para comenzar'
-                      : `Completa el nivel ${completedLevels + 1} para continuar tu progreso`
-                    }
+                  <div className="text-sm text-white/80 font-semibold">
+                    {completedLevels}/{totalLevels} niveles completados
                   </div>
                 </div>
               </div>
+
+              {/* Barra de progreso principal */}
+              <div className="flex-1 max-w-xs">
+                <div className="flex justify-between text-sm text-white/90 mb-2 font-semibold">
+                  <span>🎯 Progreso General</span>
+                  <span className="text-yellow-300">{completionPercentage}%</span>
+                </div>
+                <div className="w-full bg-white/20 rounded-full h-4 overflow-hidden shadow-inner">
+                  <div 
+                    className={`h-4 rounded-full transition-all duration-1000 bg-gradient-to-r from-green-400 via-blue-400 to-purple-400 shadow-lg relative`}
+                    style={{ width: `${completionPercentage}%` }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Puntuación total */}
+              <div className="text-right">
+                <div className="text-2xl font-black text-white bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
+                  {totalScore.toLocaleString()}
+                </div>
+                <div className="text-sm text-white/80 font-semibold">
+                  ⭐ Puntos totales
+                </div>
+              </div>
             </div>
-          )}
+
+            {/* Indicador de expansión */}
+            <div className="ml-6">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/30 to-purple-400/30 blur-md rounded-full animate-pulse"></div>
+                <svg 
+                  className={`relative w-6 h-6 text-white/80 transition-transform duration-300 ${
+                    showDetails ? 'rotate-180' : ''
+                  }`} 
+                  fill="currentColor" 
+                  viewBox="0 0 20 20"
+                >
+                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </div>
+            </div>
+          </div>
         </div>
-      )}
+
+        {/* Detalles expandibles */}
+        {showDetails && (
+          <div className="px-6 pb-6 border-t border-white/10 rounded-b-3xl">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+              {/* Estadística: Niveles completados */}
+              <div className="text-center p-4 bg-gradient-to-br from-blue-600/20 to-indigo-600/20 backdrop-blur-sm rounded-2xl border border-blue-400/20">
+                <div className="text-3xl font-black text-blue-300">
+                  {completedLevels}
+                </div>
+                <div className="text-sm text-blue-200 font-semibold">
+                  Completados
+                </div>
+                <div className="text-xs text-blue-300/80">
+                  de {totalLevels} totales
+                </div>
+              </div>
+
+              {/* Estadística: Niveles perfectos */}
+              <div className="text-center p-4 bg-gradient-to-br from-yellow-600/20 to-orange-600/20 backdrop-blur-sm rounded-2xl border border-yellow-400/20">
+                <div className="text-3xl font-black text-yellow-300">
+                  {perfectLevels}
+                </div>
+                <div className="text-sm text-yellow-200 font-semibold">
+                  Perfectos
+                </div>
+                <div className="text-xs text-yellow-300/80">
+                  {perfectPercentage}% del total
+                </div>
+              </div>
+
+              {/* Estadística: Puntuación promedio */}
+              <div className="text-center p-4 bg-gradient-to-br from-green-600/20 to-emerald-600/20 backdrop-blur-sm rounded-2xl border border-green-400/20">
+                <div className="text-3xl font-black text-green-300">
+                  {averageScore.toLocaleString()}
+                </div>
+                <div className="text-sm text-green-200 font-semibold">
+                  Promedio
+                </div>
+                <div className="text-xs text-green-300/80">
+                  por nivel
+                </div>
+              </div>
+
+              {/* Estadística: Eficiencia */}
+              <div className="text-center p-4 bg-gradient-to-br from-purple-600/20 to-pink-600/20 backdrop-blur-sm rounded-2xl border border-purple-400/20">
+                <div className="text-3xl font-black text-purple-300">
+                  {Math.round((perfectLevels / Math.max(completedLevels, 1)) * 100)}%
+                </div>
+                <div className="text-sm text-purple-200 font-semibold">
+                  Eficiencia
+                </div>
+                <div className="text-xs text-purple-300/80">
+                  perfectos/completados
+                </div>
+              </div>
+            </div>
+
+            {/* Logros y badges */}
+            <div className="mt-6">
+              <h4 className="text-lg font-bold text-white/90 mb-4 flex items-center gap-2">
+                <span className="text-xl">🏆</span>
+                Logros Desbloqueados
+              </h4>
+              <div className="flex flex-wrap gap-3">
+                {completedLevels >= 1 && (
+                  <span className="inline-flex items-center px-4 py-2 rounded-full text-sm bg-gradient-to-r from-blue-600/80 to-indigo-600/80 text-blue-100 border border-blue-400/30 backdrop-blur-sm">
+                    🎯 Primer Nivel
+                  </span>
+                )}
+                {completedLevels >= 3 && (
+                  <span className="inline-flex items-center px-4 py-2 rounded-full text-sm bg-gradient-to-r from-green-600/80 to-emerald-600/80 text-green-100 border border-green-400/30 backdrop-blur-sm">
+                    🔥 En Racha
+                  </span>
+                )}
+                {perfectLevels >= 1 && (
+                  <span className="inline-flex items-center px-4 py-2 rounded-full text-sm bg-gradient-to-r from-yellow-600/80 to-orange-600/80 text-yellow-100 border border-yellow-400/30 backdrop-blur-sm">
+                    ⭐ Perfeccionista
+                  </span>
+                )}
+                {completedLevels === totalLevels && (
+                  <span className="inline-flex items-center px-4 py-2 rounded-full text-sm bg-gradient-to-r from-purple-600/80 to-pink-600/80 text-purple-100 border border-purple-400/30 backdrop-blur-sm">
+                    👑 Completista
+                  </span>
+                )}
+                {perfectLevels === totalLevels && (
+                  <span className="inline-flex items-center px-4 py-2 rounded-full text-sm bg-gradient-to-r from-yellow-600/80 via-orange-600/80 to-red-600/80 text-yellow-100 border border-yellow-400/30 backdrop-blur-sm animate-pulse">
+                    🏆 Maestro Absoluto
+                  </span>
+                )}
+                {completedLevels === 0 && (
+                  <span className="inline-flex items-center px-4 py-2 rounded-full text-sm bg-gradient-to-r from-gray-600/80 to-slate-600/80 text-gray-100 border border-gray-400/30 backdrop-blur-sm">
+                    🎮 ¡Comienza tu aventura!
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Próximo objetivo */}
+            {completedLevels < totalLevels && (
+              <div className="mt-6 relative">
+                <div className="absolute -inset-2 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 blur-lg rounded-2xl animate-pulse"></div>
+                <div className="relative p-4 bg-gradient-to-r from-blue-600/20 via-indigo-600/20 to-purple-600/20 backdrop-blur-sm rounded-2xl border border-blue-400/30">
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-400/30 to-purple-400/30 blur-md rounded-full animate-pulse"></div>
+                      <span className="relative text-2xl">🎯</span>
+                    </div>
+                    <div>
+                      <div className="text-lg font-bold text-blue-200">
+                        Próximo Objetivo
+                      </div>
+                      <div className="text-sm text-blue-300/90">
+                        {completedLevels === 0 
+                          ? '¡Completa tu primer nivel para comenzar la aventura!'
+                          : `Completa el nivel ${completedLevels + 1} para continuar tu épica travesía`
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

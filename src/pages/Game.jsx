@@ -296,157 +296,264 @@ export default function Game() {
   }
 
   return (
-    <div className="min-h-screen">
-      {/* Header con información del tema y botones de navegación */}
-      {screenState === SCREEN_STATES.PLAYING && (
-        <div className="mb-8">
-          <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4">
-            {/* Botón izquierdo: Cambiar Nivel */}
-            <Button
-              onClick={handleBackToLevelSelect}
-              variant="outline"
-              size="medium"
-            >
-              ← Cambiar Nivel
-            </Button>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 relative overflow-hidden">
+      {/* Patrón de fondo tipo juego de memoria */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="grid grid-cols-12 gap-2 h-full p-4">
+          {Array.from({ length: 144 }).map((_, i) => (
+            <div
+              key={i}
+              className={`rounded-lg ${
+                i % 3 === 0 ? 'bg-blue-400' : i % 3 === 1 ? 'bg-purple-400' : 'bg-pink-400'
+              } animate-pulse`}
+              style={{ animationDelay: `${i * 0.05}s` }}
+            />
+          ))}
+        </div>
+      </div>
 
-            {/* Título del tema en el centro */}
-            <div className="flex-1 flex justify-center">
-              <div className="inline-flex items-center gap-3 bg-white dark:bg-gray-800 rounded-full px-6 py-3 shadow-lg">
-                <span className="text-3xl">{selectedTheme.icon}</span>
-                <div className="text-left">
-                  <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
-                    {selectedTheme.name}
-                  </h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
-                    Nivel {currentLevel} de 5
-                  </p>
+      {/* Efectos de partículas flotantes */}
+      <div className="absolute inset-0 pointer-events-none">
+        {Array.from({ length: 20 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-2 h-2 bg-yellow-300 rounded-full animate-bounce opacity-60"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${2 + Math.random() * 2}s`
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="relative z-10">
+        {/* Header con información del tema y botones de navegación */}
+        {screenState === SCREEN_STATES.PLAYING && (
+          <div className="mb-8 pt-6">
+            <div className="max-w-7xl mx-auto px-4">
+              {/* Contenedor con efectos visuales mejorados */}
+              <div className="relative">
+                {/* Efectos de borde neón */}
+                <div className="absolute -inset-4 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 blur-xl rounded-3xl animate-pulse"></div>
+                
+                <div className="relative bg-black/20 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
+                  <div className="flex items-center justify-between gap-4">
+                    {/* Botón izquierdo: Cambiar Nivel */}
+                    <div className="flex-1">
+                      <button
+                        onClick={handleBackToLevelSelect}
+                        className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-purple-500/30"
+                      >
+                        ← Cambiar Nivel
+                      </button>
+                    </div>
+
+                    {/* Título del tema en el centro */}
+                    <div className="flex-2 flex justify-center">
+                      <div className="inline-flex items-center gap-4 bg-gradient-to-r from-indigo-600/80 via-purple-600/80 to-pink-600/80 backdrop-blur-sm rounded-2xl px-8 py-4 shadow-xl border border-white/20">
+                        <span className="text-4xl animate-pulse">{selectedTheme.icon}</span>
+                        <div className="text-center">
+                          <h2 className="text-2xl font-black text-white bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
+                            {selectedTheme.name}
+                          </h2>
+                          <p className="text-sm text-white/90 font-semibold">
+                            🎯 Nivel {currentLevel} de 5
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Botón derecho: Menú Principal */}
+                    <div className="flex-1 flex justify-end">
+                      <button
+                        onClick={handleBackToHome}
+                        className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-green-500/30"
+                      >
+                        🏠 Menú Principal
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-
-            {/* Botón derecho: Menú Principal */}
-            <Button
-              onClick={handleBackToHome}
-              variant="outline"
-              size="medium"
-            >
-              🏠 Menú Principal
-            </Button>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Header con botón de volver para selector de niveles */}
-      {screenState === SCREEN_STATES.LEVEL_SELECT && (
-        <div className="mb-8">
-          <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4">
-            {/* Espacio flexible izquierdo */}
-            <div className="flex-1"></div>
-            
-            {/* Título del tema en el centro */}
-            <div className="flex items-center gap-3 bg-white dark:bg-gray-800 rounded-full px-6 py-3 shadow-lg">
-              <span className="text-3xl">{selectedTheme.icon}</span>
-              <div className="text-left">
-                <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
-                  {selectedTheme.name}
-                </h2>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Nivel {currentLevel} de 5
-                </p>
+        {/* Header con botón de volver para selector de niveles */}
+        {screenState === SCREEN_STATES.LEVEL_SELECT && (
+          <div className="mb-8 pt-6">
+            <div className="max-w-7xl mx-auto px-4">
+              {/* Contenedor con efectos visuales mejorados */}
+              <div className="relative">
+                {/* Efectos de borde neón */}
+                <div className="absolute -inset-4 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 blur-xl rounded-3xl animate-pulse"></div>
+                
+                <div className="relative bg-black/20 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
+                  <div className="flex items-center justify-between gap-4">
+                    {/* Espacio flexible izquierdo */}
+                    <div className="flex-1"></div>
+                    
+                    {/* Título del tema en el centro */}
+                    <div className="flex justify-center">
+                      <div className="inline-flex items-center gap-4 bg-gradient-to-r from-indigo-600/80 via-purple-600/80 to-pink-600/80 backdrop-blur-sm rounded-2xl px-8 py-4 shadow-xl border border-white/20">
+                        <span className="text-4xl animate-pulse">{selectedTheme.icon}</span>
+                        <div className="text-center">
+                          <h2 className="text-2xl font-black text-white bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
+                            {selectedTheme.name}
+                          </h2>
+                          <p className="text-sm text-white/90 font-semibold">
+                            🎮 Selecciona tu nivel
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Botón volver a la derecha */}
+                    <div className="flex-1 flex justify-end">
+                      <button
+                        onClick={handleBackToHome}
+                        className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-red-500/30"
+                      >
+                        ← Volver al Menú
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-            
-            {/* Botón volver a la derecha */}
-            <div className="flex-1 flex justify-end">
-              <Button
-                onClick={handleBackToHome}
-                variant="outline"
-                size="medium"
-              >
-                ← Volver al Menú
-              </Button>
+          </div>
+        )}
+
+        {/* Header simplificado para estado de carga */}
+        {screenState === SCREEN_STATES.LOADING && (
+          <div className="mb-8 pt-6">
+            <div className="max-w-7xl mx-auto px-4 text-center">
+              {/* Contenedor con efectos visuales mejorados */}
+              <div className="relative inline-block">
+                {/* Efectos de borde neón */}
+                <div className="absolute -inset-4 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 blur-xl rounded-3xl animate-pulse"></div>
+                
+                <div className="relative bg-black/20 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
+                  <div className="inline-flex items-center gap-4 bg-gradient-to-r from-indigo-600/80 via-purple-600/80 to-pink-600/80 backdrop-blur-sm rounded-2xl px-8 py-4 shadow-xl border border-white/20">
+                    <span className="text-4xl animate-pulse">{selectedTheme.icon}</span>
+                    <div className="text-center">
+                      <h2 className="text-2xl font-black text-white bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
+                        {selectedTheme.name}
+                      </h2>
+                      <p className="text-sm text-white/90 font-semibold">
+                        ⚡ Cargando Nivel {currentLevel}...
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Header simplificado para estado de carga */}
-      {screenState === SCREEN_STATES.LOADING && (
-        <div className="mb-8 text-center">
-          <div className="inline-flex items-center gap-3 bg-white dark:bg-gray-800 rounded-full px-6 py-3 shadow-lg">
-            <span className="text-3xl">{selectedTheme.icon}</span>
-            <div className="text-left">
-              <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
-                {selectedTheme.name}
-              </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-300">
-                Nivel {currentLevel} de 5
-              </p>
+        {/* Selector de Niveles */}
+        {screenState === SCREEN_STATES.LEVEL_SELECT && showLevelSelector && (
+          <div className="max-w-7xl mx-auto px-4">
+            {/* Contenedor con efectos visuales mejorados */}
+            <div className="relative">
+              {/* Efectos de borde neón */}
+              <div className="absolute -inset-4 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 blur-xl rounded-3xl animate-pulse"></div>
+              
+              <div className="relative bg-black/20 backdrop-blur-sm rounded-3xl border border-white/10 p-8">
+                {/* Patrón de circuito en el fondo */}
+                <div className="absolute inset-0 opacity-5">
+                  <svg className="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <pattern id="circuit-game" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                        <path d="M 0,10 L 10,10 L 10,0 L 20,0 M 10,10 L 10,20 M 10,10 L 20,10" stroke="white" strokeWidth="0.5" fill="none"/>
+                      </pattern>
+                    </defs>
+                    <rect width="100%" height="100%" fill="url(#circuit-game)"/>
+                  </svg>
+                </div>
+                
+                <div className="relative z-10">
+                  <LevelSelector
+                    playerProgress={playerProgress}
+                    onLevelSelect={handleLevelSelect}
+                    currentTheme={themeId}
+                  />
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Selector de Niveles */}
-      {screenState === SCREEN_STATES.LEVEL_SELECT && showLevelSelector && (
-        <div className="max-w-7xl mx-auto px-4">
-          <LevelSelector
-            playerProgress={playerProgress}
-            onLevelSelect={handleLevelSelect}
-            currentTheme={themeId}
-          />
-        </div>
-      )}
-
-      {/* Estado de Carga */}
-      {screenState === SCREEN_STATES.LOADING && (
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-500 mx-auto mb-4"></div>
-            <p className="text-xl font-semibold text-gray-700 dark:text-gray-300">
-              Cargando Nivel {currentLevel}...
-            </p>
+        {/* Estado de Carga */}
+        {screenState === SCREEN_STATES.LOADING && (
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              {/* Contenedor con efectos visuales mejorados */}
+              <div className="relative inline-block">
+                {/* Efectos de borde neón */}
+                <div className="absolute -inset-8 bg-gradient-to-r from-cyan-500/30 via-purple-500/30 to-pink-500/30 blur-xl rounded-full animate-pulse"></div>
+                
+                <div className="relative bg-black/20 backdrop-blur-sm rounded-3xl border border-white/10 p-8">
+                  <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-gradient-to-r from-yellow-400 to-orange-500 mx-auto mb-6 shadow-2xl"></div>
+                  <div className="w-20 h-20 border-4 border-transparent border-t-yellow-400 border-r-orange-500 border-b-pink-500 border-l-purple-500 rounded-full animate-spin mx-auto mb-6"></div>
+                  <h3 className="text-2xl font-black text-white bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent mb-2">
+                    ⚡ Cargando Nivel {currentLevel}...
+                  </h3>
+                  <p className="text-lg font-semibold text-white/80">
+                    Preparando tu aventura épica
+                  </p>
+                  
+                  {/* Barra de progreso animada */}
+                  <div className="mt-6 w-48 mx-auto">
+                    <div className="w-full bg-white/20 rounded-full h-2 overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 rounded-full animate-pulse"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Tablero de Juego */}
-      {screenState === SCREEN_STATES.PLAYING && (
-        <div>
-          <GameBoard
-            key={`${themeId}-${currentLevel}`}
-            theme={themeId}
-            level={currentLevel}
-            onGameComplete={handleGameComplete}
-          />
-        </div>
-      )}
+        {/* Tablero de Juego */}
+        {screenState === SCREEN_STATES.PLAYING && (
+          <div>
+            <GameBoard
+              key={`${themeId}-${currentLevel}`}
+              theme={themeId}
+              level={currentLevel}
+              onGameComplete={handleGameComplete}
+            />
+          </div>
+        )}
 
-      {/* Modal de Victoria */}
-      <VictoryModal
-        isOpen={screenState === SCREEN_STATES.VICTORY && lastGameResult !== null}
-        onClose={handleCloseModal}
-        gameResult={lastGameResult}
-        onNextLevel={currentLevel < 5 ? handleNextLevel : null}
-        onRetry={handleRetry}
-        onBackToHome={handleBackToHome}
-        isLastLevel={currentLevel === 5}
-        canGoToNextLevel={nextLevelValidation.canAccess}
-        nextLevelRequirements={nextLevelValidation.requirements}
-        currentScore={nextLevelValidation.currentScore}
-        currentAccuracy={nextLevelValidation.currentAccuracy}
-      />
+        {/* Modal de Victoria */}
+        <VictoryModal
+          isOpen={screenState === SCREEN_STATES.VICTORY && lastGameResult !== null}
+          onClose={handleCloseModal}
+          gameResult={lastGameResult}
+          onNextLevel={currentLevel < 5 ? handleNextLevel : null}
+          onRetry={handleRetry}
+          onBackToHome={handleBackToHome}
+          isLastLevel={currentLevel === 5}
+          canGoToNextLevel={nextLevelValidation.canAccess}
+          nextLevelRequirements={nextLevelValidation.requirements}
+          currentScore={nextLevelValidation.currentScore}
+          currentAccuracy={nextLevelValidation.currentAccuracy}
+        />
 
-      {/* Modal de Game Over */}
-      <GameOverModal
-        isOpen={screenState === SCREEN_STATES.GAME_OVER && lastGameResult !== null}
-        onClose={handleCloseModal}
-        gameResult={lastGameResult}
-        onRetry={handleRetry}
-        onBackToHome={handleBackToHome}
-        bestScore={bestScore}
-      />
+        {/* Modal de Game Over */}
+        <GameOverModal
+          isOpen={screenState === SCREEN_STATES.GAME_OVER && lastGameResult !== null}
+          onClose={handleCloseModal}
+          gameResult={lastGameResult}
+          onRetry={handleRetry}
+          onBackToHome={handleBackToHome}
+          bestScore={bestScore}
+        />
+      </div>
     </div>
   );
 }

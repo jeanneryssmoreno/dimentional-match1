@@ -61,16 +61,7 @@ const LevelSelector = ({
 
   return (
     <div className={`w-full ${className}`}>
-      {/* Resumen de progreso general */}
-      <div className="mb-8">
-        <ProgressSummary 
-          progress={overallProgress}
-          onToggleDetails={() => setShowDetails(!showDetails)}
-          showDetails={showDetails}
-        />
-      </div>
-
-      {/* Grid de niveles - distribución mejorada */}
+      {/* Grid de niveles - ahora va primero */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 mb-8">
         {allLevels.map((level) => {
           const status = getLevelUnlockStatus(level.id, playerProgress);
@@ -88,6 +79,15 @@ const LevelSelector = ({
             />
           );
         })}
+      </div>
+
+      {/* Resumen de progreso general - ahora va después de las tarjetas */}
+      <div className="mb-8">
+        <ProgressSummary 
+          progress={overallProgress}
+          onToggleDetails={() => setShowDetails(!showDetails)}
+          showDetails={showDetails}
+        />
       </div>
 
       {/* Detalles del nivel seleccionado */}
