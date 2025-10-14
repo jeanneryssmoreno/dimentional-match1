@@ -10,7 +10,8 @@ export const THEMES = {
     description: 'Dimensiones infinitas, personajes únicos',
     color: 'from-green-400 to-blue-500',
     icon: '🛸',
-    api: 'https://rickandmortyapi.com/api'
+    api: 'https://rickandmortyapi.com/api',
+    image: '/images/themes/nuevo rick and morthyn.gif'
   },
   STAR_WARS: {
     id: 'starwars',
@@ -18,7 +19,8 @@ export const THEMES = {
     description: 'La galaxia muy, muy lejana',
     color: 'from-yellow-400 to-orange-500',
     icon: '⚔️',
-    api: 'https://swapi.dev/api'
+    api: 'https://swapi.dev/api',
+    image: '/images/themes/gif start wars.gif'
   },
   GAME_OF_THRONES: {
     id: 'gameofthrones',
@@ -26,7 +28,8 @@ export const THEMES = {
     description: 'Los Siete Reinos te esperan',
     color: 'from-red-500 to-gray-700',
     icon: '🐉',
-    api: 'https://thronesapi.com/api/v2'
+    api: 'https://thronesapi.com/api/v2',
+    image: '/images/themes/gif Game of throne.gif'
   },
   POKEMON: {
     id: 'pokemon',
@@ -34,7 +37,8 @@ export const THEMES = {
     description: 'Hazte con todos',
     color: 'from-red-400 to-yellow-400',
     icon: '⚡',
-    api: 'https://pokeapi.co/api/v2'
+    api: 'https://pokeapi.co/api/v2',
+    image: '/images/themes/pokemon.gif'
   },
   MIXED: {
     id: 'mixed',
@@ -42,7 +46,8 @@ export const THEMES = {
     description: 'Todos los universos combinados',
     color: 'from-purple-400 via-pink-500 to-blue-500',
     icon: '🌌',
-    api: null // Combinación de todas las APIs
+    api: null, // Combinación de todas las APIs
+    image: '/images/themes/multiverso.gif'
   }
 };
 
