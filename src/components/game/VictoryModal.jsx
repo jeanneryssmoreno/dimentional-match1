@@ -58,10 +58,10 @@ const VictoryModal = ({
       title=""
       size="large"
     >
-      <div className="text-center py-6">
+      <div className="text-center py-">
         {/* Título de Victoria */}
-        <div className="mb-6">
-          <div className="text-6xl mb-4">🎉</div>
+        <div className="mb-">
+          <div className="text-6xl mb-">🎉</div>
           <h2 className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
             {isLastLevel ? '¡Juego Completado!' : '¡Nivel Completado!'}
           </h2>
@@ -74,7 +74,7 @@ const VictoryModal = ({
         </div>
 
         {/* Estrellas */}
-        <div className="flex justify-center gap-2 mb-6">
+        <div className="flex justify-center gap-2 mb-">
           {[1, 2, 3].map((star) => (
             <div
               key={star}
@@ -88,13 +88,50 @@ const VictoryModal = ({
         </div>
 
         {/* Puntuación Principal */}
-        <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-xl p-6 mb-6">
-          <div className="text-5xl font-bold text-green-600 dark:text-green-400 mb-2">
+        <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-xl p- mb-6">
+          <div className="text-5xl font-bold text-green-600 dark:text-green-400 mb-1">
             {score.toLocaleString()}
           </div>
           <div className="text-sm text-gray-600 dark:text-gray-300">
             Puntos Totales
           </div>
+        </div>
+
+        {/* Botones de Acción - Movidos aquí */}
+        <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
+          {!isLastLevel && onNextLevel && (
+            <Button
+              onClick={onNextLevel}
+              variant="primary"
+              size="large"
+              className={
+                canGoToNextLevel
+                  ? "bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700"
+                  : "bg-gray-300 dark:bg-gray-600 cursor-not-allowed opacity-50"
+              }
+              disabled={!canGoToNextLevel}
+            >
+              {canGoToNextLevel ? '➡️ Siguiente Nivel' : '🔒 Nivel Bloqueado'}
+            </Button>
+          )}
+          
+          {onRetry && (
+            <Button
+              onClick={onRetry}
+              variant="outline"
+              size="large"
+            >
+              🔄 Jugar de Nuevo
+            </Button>
+          )}
+
+          <Button
+            onClick={onBackToHome}
+            variant="outline"
+            size="large"
+          >
+            🏠 Menú Principal
+          </Button>
         </div>
 
         {/* Estadísticas Detalladas */}
@@ -219,43 +256,6 @@ const VictoryModal = ({
             </div>
           </div>
         )}
-
-        {/* Botones de Acción */}
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          {!isLastLevel && onNextLevel && (
-            <Button
-              onClick={onNextLevel}
-              variant="primary"
-              size="large"
-              className={
-                canGoToNextLevel
-                  ? "bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700"
-                  : "bg-gray-300 dark:bg-gray-600 cursor-not-allowed opacity-50"
-              }
-              disabled={!canGoToNextLevel}
-            >
-              {canGoToNextLevel ? '➡️ Siguiente Nivel' : '🔒 Nivel Bloqueado'}
-            </Button>
-          )}
-          
-          {onRetry && (
-            <Button
-              onClick={onRetry}
-              variant="outline"
-              size="large"
-            >
-              🔄 Jugar de Nuevo
-            </Button>
-          )}
-
-          <Button
-            onClick={onBackToHome}
-            variant="outline"
-            size="large"
-          >
-            🏠 Menú Principal
-          </Button>
-        </div>
 
         {/* Mensaje especial para último nivel */}
         {isLastLevel && (
